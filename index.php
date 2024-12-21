@@ -1,48 +1,22 @@
 <?php
+/**
+ * Front to the TyPrint application.
+ *
+ * @package TyPrint
+ */
 
 declare(strict_types=1);
 
-use Swow\Coroutine;
-use Swow\CoroutineException;
-use Swow\Errno;
-use Swow\Http\Protocol\ProtocolException as HttpProtocolException;
-use Swow\Psr7\Server\Server;
-use Swow\SocketException;
+use TP\TP;
 
-require_once __DIR__ . '/vendor/autoload.php';
+// Absolute path to the TyPrint directory.
+const ABSPATH = __DIR__;
 
-$server = new Server();
-$server->bind('0.0.0.0', 3000)->listen();
+// Loads the TyPrint autoloader.
+require_once __DIR__ . '/tp-vendor/autoload.php';
 
-while (true) {
-    try {
-        $connection = null;
-        $connection = $server->acceptConnection();
-        Coroutine::run(static function () use ($connection): void {
-            try {
-                while (true) {
-                    try {
-                        $request = $connection->recvHttpRequest();
-                        $connection->respond(sprintf('Hello TyPrint, %s.', $request->getUri()));
-                    } catch (HttpProtocolException $exception) {
-                        $connection->error($exception->getCode(), $exception->getMessage(), close: true);
-                        break;
-                    }
-                    if (!$connection->shouldKeepAlive()) {
-                        break;
-                    }
-                }
-            } catch (Exception) {
-                // you can log error here
-            } finally {
-                $connection->close();
-            }
-        });
-    } catch (SocketException|CoroutineException $exception) {
-        if (in_array($exception->getCode(), [Errno::EMFILE, Errno::ENFILE, Errno::ENOMEM], true)) {
-            sleep(1);
-        } else {
-            break;
-        }
-    }
-}
+// Load the TyPrint configuration.
+require_once __DIR__ . '/tp-config.php';
+
+// Runs the TyPrint application.
+(new TP())->run();

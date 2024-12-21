@@ -2,14 +2,14 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "typrint/typrint",
     "type": "project",
-    "description": "Your Ultimate CMS, Fast and Powerful.",
+    "description": "Your Ultimate CMS, Modern, Fast and Powerful.",
     "homepage": "https://typrint.org",
     "keywords": ["blog", "cms", "typrint", "php cms", "wordpress", "joomla", "drupal"],
     "license": "GPL-3.0-or-later",
     "autoload": {
         "psr-4": {
+            "TP\\": "tp-core/",
             "TP\\Admin\\": "tp-admin/",
-            "TP\\Core\\": "tp-core/",
             "TP\\Content\\Plugins\\": "tp-content/plugins/",
             "TP\\Content\\Themes\\": "tp-content/themes/"
         }
@@ -21,15 +21,22 @@
         }
     ],
     "require": {
+        "php": ">=8.3",
         "ext-json": "*",
-        "php": ">=8.3"
+        "ext-swow": "*",
+        "illuminate/database": "^11.36",
+        "illuminate/support": "^11.36",
+        "nikic/fast-route": "^1.3",
+        "symfony/process": "^7.2"
     },
     "require-dev": {
         "swow/swow": "^1.5"
     },
     "config": {
         "optimize-autoloader": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "platform-check": false,
+        "vendor-dir": "tp-vendor"
     },
     "minimum-stability": "stable",
     "prefer-stable": true

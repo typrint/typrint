@@ -1,0 +1,15 @@
+{
+	"type": "module",
+	"private": true,
+	"author": {
+		"name": "TyPrint Core Team",
+		"url": "https://typrint.org"
+	},
+	"license": "GPL-3.0-or-later",
+	"repository": {
+		"url": "https://github.com/typrint/typrint"
+	},
+	"devDependencies": {
+		"chokidar": "^4.0.3"
+	}
+}

@@ -1,6 +1,6 @@
 # TyPrint
 
-Your Ultimate CMS, Fast and Powerful.
+Your Ultimate CMS, Modern, Fast and Powerful.
 
 ## What is TyPrint?
 

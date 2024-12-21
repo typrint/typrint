@@ -20,5 +20,9 @@ Thumbs.db
 *.sublime*
 .project
 
-# Composer
-vendor/
+# Dependency directories
+tp-vendor/
+node_modules/
+
+# TyPrint
+tp-config.php
