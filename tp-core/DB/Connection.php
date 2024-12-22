@@ -170,11 +170,11 @@ class Connection implements ConnectionInterface
             isset($this->lastInsertId) && $this->lastInsertId = null;
             isset($this->rowCount) && $this->rowCount = null;
             if (isset($ex)) {
-                // 有异常: 使用默认值, 不调用 driver, statement
+                // Has exception: use the default value, do not call driver, statement
                 $this->lastInsertId = '';
                 $this->rowCount = 0;
             } elseif ($this->driver->pool && !$this instanceof Transaction) {
-                // 有pool: 提前缓存 lastInsertId, rowCount 让连接提前归还
+                // Has pool: cache lastInsertId, rowCount in advance to return the connection in advance
                 try {
                     if (str_contains($this->sql, 'INSERT INTO')) {
                         $this->lastInsertId = $this->driver->instance()->lastInsertId();
@@ -547,7 +547,7 @@ class Connection implements ConnectionInterface
         return new Transaction($driver, $this->logger);
     }
 
-    public function __destruct()
+    public function destruct(): void
     {
         $this->executed = true;
 

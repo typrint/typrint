@@ -36,7 +36,7 @@ class Transaction extends Connection
         if (!$this->driver->instance()->commit()) {
             throw new \PDOException('Commit transaction failed');
         }
-        $this->__destruct();
+        $this->destruct();
     }
 
     /**
@@ -49,6 +49,6 @@ class Transaction extends Connection
         if (!$this->driver->instance()->rollBack()) {
             throw new \PDOException('Rollback transaction failed');
         }
-        $this->__destruct();
+        $this->destruct();
     }
 }

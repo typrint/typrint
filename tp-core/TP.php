@@ -17,6 +17,7 @@ use Swow\Channel;
 use Swow\Coroutine;
 use Swow\Signal;
 use TP\DB\DB;
+use TP\DB\Migration\Migrator;
 use TP\Filesystem\Watcher\Watcher;
 use TP\Route\Route;
 
@@ -38,6 +39,7 @@ class TP
 
         // Initialize Database
         DB::init();
+        Migrator::run();
 
         // Listen file changes
         $watcher = new Watcher();
