@@ -11,8 +11,8 @@ declare(strict_types=1);
  * that is with this source code in the file LICENSE.
  */
 
-namespace TP\Filesystem\Watcher;
+namespace TP\DB\Pool;
 
-class CouldNotStartWatcherException extends \Exception
+class WaitTimeoutException extends \RuntimeException
 {
 }

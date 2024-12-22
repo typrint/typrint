@@ -11,8 +11,9 @@ declare(strict_types=1);
  * that is with this source code in the file LICENSE.
  */
 
-namespace TP\Filesystem\Watcher;
+namespace TP\DB;
 
-class CouldNotStartWatcherException extends \Exception
+interface LoggerInterface
 {
+    public function trace(float $time, string $sql, array $bindings, int $rowCount, ?\Throwable $exception): void;
 }

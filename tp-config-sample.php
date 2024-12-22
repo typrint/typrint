@@ -1,6 +1,7 @@
 <?php
+
 /**
- * The base configuration for TyPrint
+ * The base configuration for TyPrint.
  *
  * The tp-config.php creation script uses this file during the installation.
  * You don't have to use the website, you can copy this file to "tp-config.php"
@@ -12,14 +13,10 @@
  * * Database settings
  * * Secret keys
  *
- * @link TODO
- *
- * @package TyPrint
+ * @see TODO
  */
 
 declare(strict_types=1);
-
-// Server settings - You can get this info from your web host
 
 /** The listen address for TyPrint */
 const SERVER_ADDRESS = '0.0.0.0';
@@ -35,7 +32,7 @@ const DB_TYPE = 'mysql';
 
 /** The name of the database for TyPrint */
 /** For sqlite, it's the path to the database file */
-const DB_DATABASE = 'database_name_here';
+const DB_NAME = 'database_name_here';
 
 /** Database username */
 const DB_USER = 'username_here';
@@ -43,8 +40,11 @@ const DB_USER = 'username_here';
 /** Database password */
 const DB_PASSWORD = 'password_here';
 
-/** Database hostname or socket */
+/** Database hostname */
 const DB_HOST = '127.0.0.1';
+
+/** Database port */
+const DB_PORT = 3306;
 
 /** Database table prefix */
 /** Change this if you have multiple installations in the same database */
@@ -75,7 +75,7 @@ const NONCE_KEY = 'put your unique phrase here';
  * For information on other constants that can be used for debugging,
  * visit the documentation.
  *
- * @link TODO
+ * @see TODO
  */
 const TP_DEBUG = false;
 

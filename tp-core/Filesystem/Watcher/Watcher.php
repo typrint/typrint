@@ -2,9 +2,17 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of TyPrint.
+ *
+ * (c) TyPrint Core Team <https://typrint.org>
+ *
+ * This source file is subject to the GNU General Public License version 3
+ * that is with this source code in the file LICENSE.
+ */
+
 namespace TP\Filesystem\Watcher;
 
-use Closure;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -37,7 +45,7 @@ class Watcher
     /** @var callable[] */
     protected array $onAny = [];
 
-    protected Closure $shouldContinue;
+    protected \Closure $shouldContinue;
 
     public static function path(string $path): self
     {
@@ -51,7 +59,7 @@ class Watcher
 
     public function __construct()
     {
-        $this->shouldContinue = fn() => true;
+        $this->shouldContinue = fn () => true;
     }
 
     public function setPaths(string|array $paths): self
@@ -114,7 +122,7 @@ class Watcher
         return $this;
     }
 
-    public function shouldContinue(Closure $shouldContinue): self
+    public function shouldContinue(\Closure $shouldContinue): self
     {
         $this->shouldContinue = $shouldContinue;
 
@@ -123,7 +131,7 @@ class Watcher
 
     public function stop(): void
     {
-        $this->shouldContinue = fn() => false;
+        $this->shouldContinue = fn () => false;
     }
 
     /**
@@ -152,16 +160,16 @@ class Watcher
         }
     }
 
-    public function startFn(): Closure
+    public function startFn(): \Closure
     {
-        return fn() => $this->start();
+        return fn () => $this->start();
     }
 
     protected function getWatchProcess(): Process
     {
         $command = [
             (new ExecutableFinder())->find('node'),
-            realpath(__DIR__ . '/file-watcher.cjs'),
+            realpath(__DIR__.'/file-watcher.cjs'),
             json_encode($this->paths),
         ];
 
