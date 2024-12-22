@@ -76,6 +76,14 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get PDO instance.
+     */
+    public function instance(): \PDO
+    {
+        return $this->driver->instance();
+    }
+
+    /**
      * Connect to database.
      *
      * @throws \PDOException

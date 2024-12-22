@@ -15,6 +15,8 @@ namespace TP\DB;
 
 interface ConnectionInterface
 {
+    public function instance(): \PDO;
+
     public function debug(\Closure $func): self;
 
     public function raw(string $sql, ...$values): self;

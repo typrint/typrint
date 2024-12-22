@@ -26,14 +26,6 @@ class TP
     {
         // Load TyPrint configuration
         require_once ABSPATH.'/tp-config.php';
-        $this->define('TP', 'tp-core');
-    }
-
-    public function define(string $name, string $value): void
-    {
-        if (!defined($name)) {
-            define($name, $value);
-        }
     }
 
     public function run(): void

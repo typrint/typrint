@@ -140,11 +140,11 @@ class DB
     }
 
     /**
-     * Borrow connection.
+     * Borrow a connection.
      *
      * @throws WaitTimeoutException
      */
-    protected function borrow(): Connection
+    public function connection(): Connection
     {
         $driver = $this->pool->borrow();
 
@@ -153,7 +153,7 @@ class DB
 
     public function debug(\Closure $func): ConnectionInterface
     {
-        return $this->borrow()->debug($func);
+        return $this->connection()->debug($func);
     }
 
     /**
@@ -163,7 +163,7 @@ class DB
      */
     public function raw(string $sql, ...$values): ConnectionInterface
     {
-        return $this->borrow()->raw($sql, ...$values);
+        return $this->connection()->raw($sql, ...$values);
     }
 
     /**
@@ -173,7 +173,7 @@ class DB
      */
     public function exec(string $sql, ...$values): ConnectionInterface
     {
-        return $this->borrow()->exec($sql, ...$values);
+        return $this->connection()->exec($sql, ...$values);
     }
 
     /**
@@ -183,7 +183,7 @@ class DB
      */
     public function insert(string $table, array $data, string $insert = 'INSERT INTO'): ConnectionInterface
     {
-        return $this->borrow()->insert($table, $data, $insert);
+        return $this->connection()->insert($table, $data, $insert);
     }
 
     /**
@@ -193,7 +193,7 @@ class DB
      */
     public function batchInsert(string $table, array $data, string $insert = 'INSERT INTO'): ConnectionInterface
     {
-        return $this->borrow()->batchInsert($table, $data, $insert);
+        return $this->connection()->batchInsert($table, $data, $insert);
     }
 
     /**
@@ -203,7 +203,7 @@ class DB
      */
     public function transaction(\Closure $closure): void
     {
-        $this->borrow()->transaction($closure);
+        $this->connection()->transaction($closure);
     }
 
     /**
@@ -211,7 +211,7 @@ class DB
      */
     public function beginTransaction(): Transaction
     {
-        return $this->borrow()->beginTransaction();
+        return $this->connection()->beginTransaction();
     }
 
     /**
@@ -219,6 +219,6 @@ class DB
      */
     public function table(string $table): ConnectionInterface
     {
-        return $this->borrow()->table($table);
+        return $this->connection()->table($table);
     }
 }
