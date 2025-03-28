@@ -24,5 +24,11 @@ Thumbs.db
 tp-vendor/
 node_modules/
 
+# Other files
+*.log
+*.cache
+*.tmp
+*.db
+
 # TyPrint
 tp-config.php
