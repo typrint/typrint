@@ -30,6 +30,7 @@
         "typrint/phinx": "^1.0"
     },
     "require-dev": {
+        "php-cs-fixer/shim": "^3.72",
         "swow/swow": "^1.5"
     },
     "config": {
