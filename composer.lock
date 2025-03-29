@@ -296,12 +296,12 @@
             },
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/contracts",
+                    "name": "symfony/contracts"
+                },
                 "branch-alias": {
                     "dev-main": "3.5-dev"
-                },
-                "thanks": {
-                    "name": "symfony/contracts",
-                    "url": "https://github.com/symfony/contracts"
                 }
             },
             "autoload": {
@@ -813,12 +813,12 @@
             },
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/contracts",
+                    "name": "symfony/contracts"
+                },
                 "branch-alias": {
                     "dev-main": "3.5-dev"
-                },
-                "thanks": {
-                    "name": "symfony/contracts",
-                    "url": "https://github.com/symfony/contracts"
                 }
             },
             "autoload": {
@@ -961,16 +961,16 @@
         },
         {
             "name": "typrint/phinx",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/typrint/phinx.git",
-                "reference": "963df4fafbf5261ab1554b47b3997a2522a6e94e"
+                "reference": "2e44c5e4c0bec0da6806dd08d37a9ae2f05e6a49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/typrint/phinx/zipball/963df4fafbf5261ab1554b47b3997a2522a6e94e",
-                "reference": "963df4fafbf5261ab1554b47b3997a2522a6e94e",
+                "url": "https://api.github.com/repos/typrint/phinx/zipball/2e44c5e4c0bec0da6806dd08d37a9ae2f05e6a49",
+                "reference": "2e44c5e4c0bec0da6806dd08d37a9ae2f05e6a49",
                 "shasum": ""
             },
             "require": {
@@ -1042,9 +1042,9 @@
                 "phinx"
             ],
             "support": {
-                "source": "https://github.com/typrint/phinx/tree/v1.0.3"
+                "source": "https://github.com/typrint/phinx/tree/v1.0.4"
             },
-            "time": "2024-12-22T19:00:13+00:00"
+            "time": "2025-03-28T19:58:58+00:00"
         }
     ],
     "packages-dev": [
