@@ -1131,23 +1131,17 @@
         },
         {
             "name": "php-cs-fixer/shim",
-            "version": "v3.72.0",
+            "version": "v3.74.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/shim.git",
-                "reference": "f5131b7a7d0103919a1b478a2763bd76c98e472e"
+                "reference": "13ea689ccf22906ccea6615be2ed88535fe545a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/f5131b7a7d0103919a1b478a2763bd76c98e472e",
-                "reference": "f5131b7a7d0103919a1b478a2763bd76c98e472e",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/13ea689ccf22906ccea6615be2ed88535fe545a3",
+                "reference": "13ea689ccf22906ccea6615be2ed88535fe545a3",
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",
@@ -1183,9 +1177,9 @@
             "description": "A tool to automatically fix PHP code style",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/shim/issues",
-                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.72.0"
+                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.74.0"
             },
-            "time": "2025-03-13T11:26:00+00:00"
+            "time": "2025-03-27T22:31:51+00:00"
         },
         {
             "name": "psr/http-client",
