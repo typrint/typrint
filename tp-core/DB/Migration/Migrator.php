@@ -26,15 +26,20 @@ class Migrator
         $connection = DB::instance()->connection();
         $config = new Config([
             'paths' => [
-                'migrations' => ABSPATH.'/tp-core/DB/Migrator/migrations',
-                'seeds' => ABSPATH.'/tp-core/DB/Migrator/seeds',
+                'migrations' => ABSPATH.'/tp-core/DB/Migration/migrations',
+                'seeds' => ABSPATH.'/tp-core/DB/Migration/seeds',
             ],
             'environments' => [
                 'default_migration_table' => DB_TABLE_PREFIX.'migrations',
                 'default_environment' => 'typrint',
                 'typrint' => [
+                    'name' => DB_NAME,
                     'connection' => $connection->instance(),
                 ],
+            ],
+            'feature_flags' => [
+                'column_null_default' => false,
+                'add_timestamps_use_datetime' => true,
             ],
         ]);
         $manager = new Manager($config, new StringInput(''), new NullOutput());
