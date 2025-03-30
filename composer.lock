@@ -1077,16 +1077,16 @@
         },
         {
             "name": "typrint/phinx",
-            "version": "v1.0.4",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/typrint/phinx.git",
-                "reference": "2e44c5e4c0bec0da6806dd08d37a9ae2f05e6a49"
+                "reference": "57f6469a0bb82b8cafe7d5a715cb0ff0599cea99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/typrint/phinx/zipball/2e44c5e4c0bec0da6806dd08d37a9ae2f05e6a49",
-                "reference": "2e44c5e4c0bec0da6806dd08d37a9ae2f05e6a49",
+                "url": "https://api.github.com/repos/typrint/phinx/zipball/57f6469a0bb82b8cafe7d5a715cb0ff0599cea99",
+                "reference": "57f6469a0bb82b8cafe7d5a715cb0ff0599cea99",
                 "shasum": ""
             },
             "require": {
@@ -1158,9 +1158,9 @@
                 "phinx"
             ],
             "support": {
-                "source": "https://github.com/typrint/phinx/tree/v1.0.4"
+                "source": "https://github.com/typrint/phinx/tree/v1.0.5"
             },
-            "time": "2025-03-28T19:58:58+00:00"
+            "time": "2025-03-28T21:20:40+00:00"
         }
     ],
     "packages-dev": [
