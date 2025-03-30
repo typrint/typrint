@@ -13,20 +13,25 @@ declare(strict_types=1);
 
 namespace TP\Utils;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Swow\Psr7\Server\EventDriver;
-use Swow\Psr7\Server\ServerConnection;
+use Swow\Coroutine;
+use Swow\CoroutineException;
+use Swow\Errno;
+use Swow\Http\Protocol\ProtocolException as HttpProtocolException;
+use Swow\Psr7\Server\Server as SwowServer;
+use Swow\SocketException;
 
 class Server
 {
-    private EventDriver $server;
+    private SwowServer $server;
     private string $address;
     private int $port;
     private \Closure $handler;
 
     public function __construct(string $address, int $port, $handler)
     {
-        $this->server = new EventDriver();
+        $this->server = new SwowServer();
         $this->address = $address;
         $this->port = $port;
         $this->handler = $handler;
@@ -34,12 +39,53 @@ class Server
 
     public function start(): void
     {
+        $this->server->bind($this->address, $this->port)->listen();
         $handler = $this->handler;
-        $this->server->withRequestHandler(
-            static function (ServerConnection $connection, ServerRequestInterface $request) use ($handler): string {
-                return $handler($request);
+        while (true) {
+            try {
+                $connection = $this->server->acceptConnection();
+                Coroutine::run(static function () use ($connection, $handler): void {
+                    try {
+                        while (true) {
+                            $request = null;
+                            try {
+                                /** @var ServerRequestInterface $request */
+                                $request = $connection->recvHttpRequest();
+                                $response = $handler($request);
+                                if (null !== $response) {
+                                    if ($response instanceof ResponseInterface) {
+                                        $connection->sendHttpResponse($response);
+                                    } elseif (is_array($response)) {
+                                        $connection->respond(...$response);
+                                    } else {
+                                        $connection->respond($response);
+                                    }
+                                }
+                            } catch (HttpProtocolException $exception) {
+                                $connection->error($exception->getCode(), $exception->getMessage(), close: true);
+                                break;
+                            }
+                            if (!$connection->shouldKeepAlive()) {
+                                break;
+                            }
+                        }
+                    } catch (\Exception) {
+                    } finally {
+                        $connection->close();
+                    }
+                });
+            } catch (CoroutineException|SocketException $exception) {
+                if (in_array($exception->getCode(), [Errno::EMFILE, Errno::ENFILE, Errno::ENOMEM], true)) {
+                    sleep(1);
+                } else {
+                    break;
+                }
             }
-        );
-        $this->server->startOn($this->address, $this->port);
+        }
+    }
+
+    public function stop(): void
+    {
+        $this->server->close();
     }
 }

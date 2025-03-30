@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace TP\Route;
 
-use Swow\Psr7\Message\ServerRequest;
-use Swow\Psr7\Server\ServerConnection;
+use Psr\Http\Message\ServerRequestInterface;
 use TP\Utils\Once;
 use TP\Utils\Server;
 
@@ -41,7 +40,7 @@ class Route
 
     public function __construct()
     {
-        $this->server = new Server(SERVER_ADDRESS, SERVER_PORT, static function (ServerConnection $connection, ServerRequest $request): string {
+        $this->server = new Server(SERVER_ADDRESS, SERVER_PORT, static function (ServerRequestInterface $request): string {
             echo sprintf(
                 "%s on %s\n",
                 $request->getMethod(),
@@ -52,12 +51,13 @@ class Route
         });
     }
 
-    public function listen(): void
+    public function listen(): callable
     {
-        $this->server->start();
+        return fn () => $this->server->start();
     }
 
     public function shutdown(): void
     {
+        $this->server->stop();
     }
 }

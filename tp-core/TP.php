@@ -56,10 +56,12 @@ class TP
         // Handle signals for graceful shutdown
         Async::run(static function () use ($channel): void {
             Signal::wait(Signal::INT);
+            Route::instance()->shutdown();
             $channel->push("Terminated by SIGINT\n");
         });
         Async::run(static function () use ($channel): void {
             Signal::wait(Signal::TERM);
+            Route::instance()->shutdown();
             $channel->push("Terminated by SIGTERM\n");
         });
         $channel->pop();
