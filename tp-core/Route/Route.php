@@ -17,7 +17,7 @@ use Swow\Psr7\Message\ServerRequest;
 use Swow\Psr7\Server\EventDriver;
 use Swow\Psr7\Server\Server;
 use Swow\Psr7\Server\ServerConnection;
-use TP\Once;
+use TP\Utils\Once;
 
 class Route
 {

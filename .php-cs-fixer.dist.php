@@ -60,4 +60,6 @@ return (new Config())
             ->ignoreDotFiles(false)
             ->ignoreVCSIgnored(true)
             ->notName('tp-config-sample.php')
+            ->notName('*.phar')
+            ->notContains('// @phpcsf-ignore')
     );

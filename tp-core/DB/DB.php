@@ -16,7 +16,7 @@ namespace TP\DB;
 use TP\DB\Pool\ConnectionPool;
 use TP\DB\Pool\ConnectionPoolOptions;
 use TP\DB\Pool\WaitTimeoutException;
-use TP\Once;
+use TP\Utils\Once;
 
 class DB
 {

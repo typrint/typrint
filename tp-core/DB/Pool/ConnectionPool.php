@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace TP\DB\Pool;
 
-use Swow\Channel;
-use Swow\Exception;
 use TP\DB\Driver;
+use TP\Utils\Channel;
 
 /**
  * ConnectionPool is a pool of db connections.
@@ -173,7 +172,7 @@ class ConnectionPool
      * Pop the connection from the queue.
      *
      * @throws WaitTimeoutException
-     * @throws Exception
+     * @throws \Exception
      */
     protected function pop(): object
     {
@@ -186,7 +185,7 @@ class ConnectionPool
             if (-1 != $timeout) {
                 throw new WaitTimeoutException(sprintf('Wait timeout: %fs', $timeout));
             }
-            throw new Exception('Channel a deadlock');
+            throw new \Exception('Channel a deadlock');
         }
 
         return $object;

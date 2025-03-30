@@ -26,6 +26,7 @@
         "ext-pdo": "*",
         "ext-swow": "*",
         "nikic/fast-route": "^1.3",
+        "psr/simple-cache": "^3.0",
         "symfony/process": "^7.2",
         "typrint/phinx": "^1.0"
     },

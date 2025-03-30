@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace TP;
 
-use Swow\Channel;
 use Swow\Coroutine;
-use Swow\Signal;
+use TP\Cache\Cache;
 use TP\DB\DB;
 use TP\DB\Migration\Migrator;
 use TP\Filesystem\Watcher\Watcher;
 use TP\Route\Route;
+use TP\Utils\Channel;
+use TP\Utils\Signal;
 
 class TP
 {
@@ -40,6 +41,9 @@ class TP
         // Initialize Database
         DB::init();
         Migrator::run();
+
+        // Initialize Cache
+        Cache::init();
 
         // Listen file changes
         $watcher = new Watcher();

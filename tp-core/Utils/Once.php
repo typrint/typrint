@@ -11,9 +11,7 @@ declare(strict_types=1);
  * that is with this source code in the file LICENSE.
  */
 
-namespace TP;
-
-use Swow\Channel;
+namespace TP\Utils;
 
 class Once
 {
