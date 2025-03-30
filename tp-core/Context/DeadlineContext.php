@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace TP\Context;
 
-use Swow\Coroutine;
+use TP\Utils\Async;
 
 /**
  * A context that is canceled when a deadline is reached.
@@ -40,11 +40,11 @@ class DeadlineContext extends CancelContext
         $seconds = $deadline->getTimestamp() - $now->getTimestamp();
 
         // Schedule a coroutine to cancel the context after the deadline
-        $coroutine = Coroutine::run(function () use ($seconds): void {
+        $coroutine = Async::run(function () use ($seconds): void {
             sleep($seconds);
             $this->cancel('context deadline exceeded');
         });
-        $this->timerId = $coroutine->getId();
+        $this->timerId = $coroutine->id();
     }
 
     public function deadline(): ?\DateTimeInterface
@@ -54,7 +54,7 @@ class DeadlineContext extends CancelContext
 
     public function cancel(string $err = 'context canceled'): void
     {
-        $coroutine = Coroutine::get($this->timerId);
+        $coroutine = Async::get($this->timerId);
         $coroutine?->kill();
         parent::cancel($err);
     }

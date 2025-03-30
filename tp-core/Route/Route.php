@@ -14,17 +14,16 @@ declare(strict_types=1);
 namespace TP\Route;
 
 use Swow\Psr7\Message\ServerRequest;
-use Swow\Psr7\Server\EventDriver;
-use Swow\Psr7\Server\Server;
 use Swow\Psr7\Server\ServerConnection;
 use TP\Utils\Once;
+use TP\Utils\Server;
 
 class Route
 {
     private static Route $instance;
 
     private static Once $once;
-    private EventDriver $server;
+    private Server $server;
 
     public static function init(): void
     {
@@ -42,40 +41,23 @@ class Route
 
     public function __construct()
     {
-        $this->server = new EventDriver();
-    }
-
-    public function listen(): callable
-    {
-        return fn () => $this->start();
-    }
-
-    public function start(): void
-    {
-        $this->server = $this->server->withStartHandler(static function (Server $server): void {
+        $this->server = new Server(SERVER_ADDRESS, SERVER_PORT, static function (ServerConnection $connection, ServerRequest $request): string {
             echo sprintf(
-                "[%s] Server started at %s:%s\n",
-                date('Y-m-d H:i:s'),
-                $server->getSockAddress(),
-                $server->getSockPort()
+                "%s on %s\n",
+                $request->getMethod(),
+                $request->getUri()->getPath()
             );
+
+            return 'Hello Swow!';
         });
-        $this->server = $this->server->withRequestHandler(
-            static function (ServerConnection $connection, ServerRequest $request): string {
-                echo sprintf(
-                    "%s on %s\n",
-                    $request->getMethod(),
-                    $request->getUri()->getPath()
-                );
-
-                return 'Hello Swow!';
-            }
-        );
-
-        $this->server->startOn(SERVER_ADDRESS, SERVER_PORT);
     }
 
-    public function reload(): void
+    public function listen(): void
+    {
+        $this->server->start();
+    }
+
+    public function shutdown(): void
     {
     }
 }

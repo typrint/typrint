@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace TP;
 
-use Swow\Coroutine;
 use TP\Cache\Cache;
 use TP\DB\DB;
 use TP\DB\Migration\Migrator;
 use TP\Filesystem\Watcher\Watcher;
 use TP\Route\Route;
+use TP\Utils\Async;
 use TP\Utils\Channel;
 use TP\Utils\Signal;
 
@@ -36,7 +36,7 @@ class TP
 
         // Initialize Router
         Route::init();
-        Coroutine::run(Route::instance()->listen());
+        Async::run(Route::instance()->listen());
 
         // Initialize Database
         DB::init();
@@ -51,14 +51,14 @@ class TP
         $watcher->onAnyChange(function ($event, $path) {
             echo "File {$path} has been {$event}\n";
         });
-        Coroutine::run($watcher->startFn());
+        Async::run($watcher->startFn());
 
         // Handle signals for graceful shutdown
-        Coroutine::run(static function () use ($channel): void {
+        Async::run(static function () use ($channel): void {
             Signal::wait(Signal::INT);
             $channel->push("Terminated by SIGINT\n");
         });
-        Coroutine::run(static function () use ($channel): void {
+        Async::run(static function () use ($channel): void {
             Signal::wait(Signal::TERM);
             $channel->push("Terminated by SIGTERM\n");
         });
