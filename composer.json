@@ -25,10 +25,11 @@
     ],
     "require": {
         "php": ">=8.3",
+        "ext-fileinfo": "*",
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-swow": "*",
-        "ext-fileinfo": "*",
+        "league/plates": "^3.5",
         "nyholm/psr7": "^1.8",
         "psr/http-message": "^2.0",
         "psr/http-server-handler": "^1.0",

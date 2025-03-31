@@ -15,6 +15,7 @@ namespace TP\Route;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TP\Admin\Route as AdminRoute;
 use TP\Utils\Chi\Router;
 use TP\Utils\Once;
 use TP\Utils\Server;
@@ -44,18 +45,19 @@ class Route
     public function __construct()
     {
         $this->router = new Router();
-        // TODO add routers
+        $this->registerRoutes();
         $this->server = new Server(SERVER_ADDRESS, SERVER_PORT);
     }
 
-    public function handle(): callable
+    public function registerRoutes(): void
     {
-        return fn (ServerRequestInterface $request): ResponseInterface => $this->router->handle($request);
+        $this->router->any('/tp-admin', fn (ServerRequestInterface $request): ResponseInterface => AdminRoute::handle($request));
+        $this->router->any('/tp-admin/*', fn (ServerRequestInterface $request): ResponseInterface => AdminRoute::handle($request));
     }
 
     public function listen(): callable
     {
-        $this->server->setHandler($this->handle());
+        $this->server->setHandler(fn (ServerRequestInterface $request): ResponseInterface => $this->router->handle($request));
 
         return fn () => $this->server->start();
     }

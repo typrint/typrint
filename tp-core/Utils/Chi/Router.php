@@ -202,7 +202,7 @@ class Router implements RequestHandlerInterface
     }
 
     /**
-     * With creates a new router with the added middleware.
+     * With adds inline middlewares for an endpoint handler.
      *
      * @param callable[] $middlewares
      */
@@ -214,6 +214,21 @@ class Router implements RequestHandlerInterface
         $router->middlewares = array_merge($this->middlewares, $middlewares);
         $router->notFoundHandler = $this->notFoundHandler;
         $router->methodNotAllowedHandler = $this->methodNotAllowedHandler;
+
+        return $router;
+    }
+
+    /**
+     * Group creates a new inline-Mux with a copy of middleware stack. It's useful
+     * for a group of handlers along the same routing path that use an additional
+     * set of middlewares.
+     */
+    public function group(callable $group): self
+    {
+        $router = $this->with();
+        if (is_callable($group)) {
+            $group($router);
+        }
 
         return $router;
     }

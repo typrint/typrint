@@ -40,21 +40,21 @@ class Hook implements \Iterator, \ArrayAccess
      *
      * @since 1.0.0
      */
-    private array $current_priority = [];
+    private array $currentPriority = [];
 
     /**
      * Number of levels this hook can be recursively called.
      *
      * @since 1.0.0
      */
-    private int $nesting_level = 0;
+    private int $nestingLevel = 0;
 
     /**
      * Flag for if we're current doing an action, rather than a filter.
      *
      * @since 1.0.0
      */
-    private bool $doing_action = false;
+    private bool $doingAction = false;
 
     public static function init(): void
     {
@@ -71,63 +71,86 @@ class Hook implements \Iterator, \ArrayAccess
     }
 
     /**
-     * Hooks a function or method to a specific filter action.
+     * Hooks a function or method to a specific action.
      *
-     * @param string   $tag             the name of the filter to hook the $function_to_add callback to
-     * @param callable $function_to_add the callback to be run when the filter is applied
-     * @param int      $priority        The order in which the functions associated with a particular action
-     *                                  are executed. Lower numbers correspond with earlier execution,
-     *                                  and functions with the same priority are executed in the order
-     *                                  in which they were added to the action.
-     * @param int      $accepted_args   the number of arguments the function accepts
+     * @param string   $tag           the name of the action to hook the $functionToAdd callback to
+     * @param callable $functionToAdd the callback to be run when the action is called
+     * @param int      $priority      The order in which the functions associated with a particular action
+     *                                are executed. Lower numbers correspond with earlier execution,
+     *                                and functions with the same priority are executed in the order
+     *                                in which they were added to the action.
+     * @param int      $acceptedArgs  the number of arguments the function accepts
      *
      * @since 1.0.0
      */
-    public function add_filter(string $tag, callable $function_to_add, int $priority, int $accepted_args): void
+    public function addAction(string $tag, callable $functionToAdd, int $priority = 10, int $acceptedArgs = 1): void
     {
-        $idx = $this->build_unique_filter_id($tag, $function_to_add);
+        $this->addFilter($tag, $functionToAdd, $priority, $acceptedArgs);
+    }
 
-        $priority_existed = isset($this->callbacks[$priority]);
+    /**
+     * Hooks a function or method to a specific filter action.
+     *
+     * @param string   $tag           the name of the filter to hook the $functionToAdd callback to
+     * @param callable $functionToAdd the callback to be run when the filter is applied
+     * @param int      $priority      The order in which the functions associated with a particular action
+     *                                are executed. Lower numbers correspond with earlier execution,
+     *                                and functions with the same priority are executed in the order
+     *                                in which they were added to the action.
+     * @param int      $acceptedArgs  the number of arguments the function accepts
+     *
+     * @since 1.0.0
+     */
+    public function addFilter(string $tag, callable $functionToAdd, int $priority = 10, int $acceptedArgs = 1): void
+    {
+        $idx = $this->buildUniqueFilterId($tag, $functionToAdd);
 
-        $this->callbacks[$priority][$idx] = [
-            'function' => $function_to_add,
-            'accepted_args' => $accepted_args,
+        $priorityExisted = isset($this->callbacks[$tag][$priority]);
+
+        $this->callbacks[$tag][$priority][$idx] = [
+            'function' => $functionToAdd,
+            'acceptedArgs' => $acceptedArgs,
         ];
 
         // If we're adding a new priority to the list, put them back in sorted order.
-        if (!$priority_existed && count($this->callbacks) > 1) {
-            ksort($this->callbacks, SORT_NUMERIC);
+        if (!$priorityExisted && isset($this->callbacks[$tag]) && count($this->callbacks[$tag]) > 1) {
+            ksort($this->callbacks[$tag], SORT_NUMERIC);
         }
 
-        if ($this->nesting_level > 0) {
-            $this->resort_active_iterations($priority, $priority_existed);
+        if ($this->nestingLevel > 0) {
+            $this->resortActiveIterations($tag, $priority, $priorityExisted);
         }
     }
 
     /**
      * Handles resetting callback priority keys mid-iteration.
      *
-     * @param false|int $new_priority     Optional. The priority of the new filter being added. Default false,
-     *                                    for no priority being added.
-     * @param bool      $priority_existed Optional. Flag for whether the priority already existed before the new
-     *                                    filter was added. Default false.
+     * @param string    $tag             The hook name
+     * @param false|int $newPriority     Optional. The priority of the new filter being added. Default false,
+     *                                   for no priority being added.
+     * @param bool      $priorityExisted Optional. Flag for whether the priority already existed before the new
+     *                                   filter was added. Default false.
      *
      * @since 1.0.0
      */
-    private function resort_active_iterations(false|int $new_priority = false, bool $priority_existed = false): void
+    private function resortActiveIterations(string $tag, false|int $newPriority = false, bool $priorityExisted = false): void
     {
-        $new_priorities = array_keys($this->callbacks);
+        if (!isset($this->callbacks[$tag])) {
+            return;
+        }
+
+        $newPriorities = array_keys($this->callbacks[$tag]);
 
         // If there are no remaining hooks, clear out all running iterations.
-        if (!$new_priorities) {
+        if (!$newPriorities) {
             foreach ($this->iterations as $index => $iteration) {
-                $this->iterations[$index] = $new_priorities;
+                $this->iterations[$index] = $newPriorities;
             }
 
             return;
         }
 
-        $min = min($new_priorities);
+        $min = min($newPriorities);
         foreach ($this->iterations as $index => &$iteration) {
             $current = current($iteration);
             // If we're already at the end of this iteration, just leave the array pointer where it is.
@@ -135,7 +158,7 @@ class Hook implements \Iterator, \ArrayAccess
                 continue;
             }
 
-            $iteration = $new_priorities;
+            $iteration = $newPriorities;
 
             if ($current < $min) {
                 array_unshift($iteration, $current);
@@ -148,8 +171,8 @@ class Hook implements \Iterator, \ArrayAccess
                 }
             }
 
-            // If we have a new priority that didn't exist, but ::apply_filters() or ::do_action() thinks it's the current priority...
-            if ($new_priority === $this->current_priority[$index] && !$priority_existed) {
+            // If we have a new priority that didn't exist, but ::applyFilters() or ::doAction() thinks it's the current priority...
+            if ($newPriority === $this->currentPriority[$index] && !$priorityExisted) {
                 /*
                  * ...and the new priority is the same as what $this->iterations thinks is the previous
                  * priority, we need to move back to it.
@@ -165,7 +188,7 @@ class Hook implements \Iterator, \ArrayAccess
                 if (false === $prev) {
                     // Start of the array. Reset, and go about our day.
                     reset($iteration);
-                } elseif ($new_priority !== $prev) {
+                } elseif ($newPriority !== $prev) {
                     // Previous wasn't the same. Move forward again.
                     next($iteration);
                 }
@@ -177,25 +200,28 @@ class Hook implements \Iterator, \ArrayAccess
     /**
      * Unhooks a function or method from a specific filter action.
      *
-     * @param string   $tag                the filter hook to which the function to be removed is hooked
-     * @param callable $function_to_remove the callback to be removed from running when the filter is applied
-     * @param int      $priority           the exact priority used when adding the original filter callback
+     * @param string   $tag              the filter hook to which the function to be removed is hooked
+     * @param callable $functionToRemove the callback to be removed from running when the filter is applied
+     * @param int      $priority         the exact priority used when adding the original filter callback
      *
      * @return bool whether the callback existed before it was removed
      *
      * @since 1.0.0
      */
-    public function remove_filter(string $tag, callable $function_to_remove, int $priority): bool
+    public function removeFilter(string $tag, callable $functionToRemove, int $priority = 10): bool
     {
-        $function_key = $this->build_unique_filter_id($tag, $function_to_remove);
+        $functionKey = $this->buildUniqueFilterId($tag, $functionToRemove);
 
-        $exists = isset($this->callbacks[$priority][$function_key]);
+        $exists = isset($this->callbacks[$tag][$priority][$functionKey]);
         if ($exists) {
-            unset($this->callbacks[$priority][$function_key]);
-            if (!$this->callbacks[$priority]) {
-                unset($this->callbacks[$priority]);
-                if ($this->nesting_level > 0) {
-                    $this->resort_active_iterations();
+            unset($this->callbacks[$tag][$priority][$functionKey]);
+            if (empty($this->callbacks[$tag][$priority])) {
+                unset($this->callbacks[$tag][$priority]);
+                if (empty($this->callbacks[$tag])) {
+                    unset($this->callbacks[$tag]);
+                }
+                if ($this->nestingLevel > 0) {
+                    $this->resortActiveIterations($tag);
                 }
             }
         }
@@ -206,31 +232,31 @@ class Hook implements \Iterator, \ArrayAccess
     /**
      * Checks if a specific action has been registered for this hook.
      *
-     * When using the `$function_to_check` argument, this function may return a non-boolean value
+     * When using the `$functionToCheck` argument, this function may return a non-boolean value
      * that evaluates to false (e.g. 0), so use the `===` operator for testing the return value.
      *
-     * @param string         $tag               Optional. The name of the filter hook. Default empty.
-     * @param callable|false $function_to_check Optional. The callback to check for. Default false.
+     * @param string         $tag             Optional. The name of the filter hook. Default empty.
+     * @param callable|false $functionToCheck Optional. The callback to check for. Default false.
      *
-     * @return int|bool If `$function_to_check` is omitted, returns boolean for whether the hook has
+     * @return int|bool If `$functionToCheck` is omitted, returns boolean for whether the hook has
      *                  anything registered. When checking a specific function, the priority of that
      *                  hook is returned, or false if the function is not attached.
      *
      * @since 1.0.0
      */
-    public function has_filter(string $tag = '', callable|false $function_to_check = false): bool|int
+    public function hasFilter(string $tag = '', callable|false $functionToCheck = false): bool|int
     {
-        if (false === $function_to_check) {
-            return $this->has_filters();
+        if (false === $functionToCheck) {
+            return !empty($this->callbacks[$tag]);
         }
 
-        $function_key = $this->build_unique_filter_id($tag, $function_to_check);
-        if (!$function_key) {
+        $functionKey = $this->buildUniqueFilterId($tag, $functionToCheck);
+        if (!$functionKey) {
             return false;
         }
 
-        foreach ($this->callbacks as $priority => $callbacks) {
-            if (isset($callbacks[$function_key])) {
+        foreach ($this->callbacks[$tag] as $priority => $callbacks) {
+            if (isset($callbacks[$functionKey])) {
                 return $priority;
             }
         }
@@ -245,7 +271,7 @@ class Hook implements \Iterator, \ArrayAccess
      *
      * @since 1.0.0
      */
-    public function has_filters(): bool
+    public function hasFilters(): bool
     {
         foreach ($this->callbacks as $callbacks) {
             if ($callbacks) {
@@ -263,7 +289,7 @@ class Hook implements \Iterator, \ArrayAccess
      *
      * @since 1.0.0
      */
-    public function remove_all_filters(false|int $priority = false): void
+    public function removeAllFilters(false|int $priority = false): void
     {
         if (!$this->callbacks) {
             return;
@@ -275,57 +301,60 @@ class Hook implements \Iterator, \ArrayAccess
             unset($this->callbacks[$priority]);
         }
 
-        if ($this->nesting_level > 0) {
-            $this->resort_active_iterations();
+        if ($this->nestingLevel > 0) {
+            $this->resortActiveIterations();
         }
     }
 
     /**
      * Calls the callback functions that have been added to a filter hook.
      *
-     * @param mixed $value the value to filter
-     * @param array $args  Additional parameters to pass to the callback functions.
-     *                     This array is expected to include $value at index 0.
+     * @param string $tag   The name of the filter hook
+     * @param mixed  $value The value to filter
+     * @param array  $args  Additional parameters to pass to the callback functions.
+     *                      This array is expected to include $value at index 0.
      *
      * @return mixed the filtered value after all hooked functions are applied to it
      *
      * @since 1.0.0
      */
-    public function apply_filters(mixed $value, array $args): mixed
+    public function applyFilter(string $tag, mixed $value, array $args = []): mixed
     {
-        if (!$this->callbacks) {
+        array_unshift($args, $value);
+
+        if (!isset($this->callbacks[$tag]) || empty($this->callbacks[$tag])) {
             return $value;
         }
 
-        $nesting_level = $this->nesting_level++;
+        $nestingLevel = $this->nestingLevel++;
 
-        $this->iterations[$nesting_level] = array_keys($this->callbacks);
-        $num_args = count($args);
+        $this->iterations[$nestingLevel] = array_keys($this->callbacks[$tag]);
+        $numArgs = count($args);
 
         do {
-            $this->current_priority[$nesting_level] = current($this->iterations[$nesting_level]);
-            $priority = $this->current_priority[$nesting_level];
+            $this->currentPriority[$nestingLevel] = current($this->iterations[$nestingLevel]);
+            $priority = $this->currentPriority[$nestingLevel];
 
-            foreach ($this->callbacks[$priority] as $the_) {
-                if (!$this->doing_action) {
+            foreach ($this->callbacks[$tag][$priority] as $the_) {
+                if (!$this->doingAction) {
                     $args[0] = $value;
                 }
 
                 // Avoid the array_slice() if possible.
-                if (0 == $the_['accepted_args']) {
+                if (0 == $the_['acceptedArgs']) {
                     $value = call_user_func($the_['function']);
-                } elseif ($the_['accepted_args'] >= $num_args) {
+                } elseif ($the_['acceptedArgs'] >= $numArgs) {
                     $value = call_user_func_array($the_['function'], $args);
                 } else {
-                    $value = call_user_func_array($the_['function'], array_slice($args, 0, (int) $the_['accepted_args']));
+                    $value = call_user_func_array($the_['function'], array_slice($args, 0, (int) $the_['acceptedArgs']));
                 }
             }
-        } while (false !== next($this->iterations[$nesting_level]));
+        } while (false !== next($this->iterations[$nestingLevel]));
 
-        unset($this->iterations[$nesting_level]);
-        unset($this->current_priority[$nesting_level]);
+        unset($this->iterations[$nestingLevel]);
+        unset($this->currentPriority[$nestingLevel]);
 
-        --$this->nesting_level;
+        --$this->nestingLevel;
 
         return $value;
     }
@@ -333,42 +362,20 @@ class Hook implements \Iterator, \ArrayAccess
     /**
      * Calls the callback functions that have been added to an action hook.
      *
-     * @param array $args parameters to pass to the callback functions
+     * @param string $tag  The name of the action hook
+     * @param array  $args Parameters to pass to the callback functions
      *
      * @since 1.0.0
      */
-    public function do_action(array $args): void
+    public function doAction(string $tag, array $args = []): void
     {
-        $this->doing_action = true;
-        $this->apply_filters('', $args);
+        $this->doingAction = true;
+        $this->applyFilter($tag, '', $args);
 
         // If there are recursive calls to the current action, we haven't finished it until we get to the last one.
-        if (!$this->nesting_level) {
-            $this->doing_action = false;
+        if (!$this->nestingLevel) {
+            $this->doingAction = false;
         }
-    }
-
-    /**
-     * Processes the functions hooked into the 'all' hook.
-     *
-     * @param array $args Arguments to pass to the hook callbacks. Passed by reference.
-     *
-     * @since 1.0.0
-     */
-    public function do_all_hook(array $args): void
-    {
-        $nesting_level = $this->nesting_level++;
-        $this->iterations[$nesting_level] = array_keys($this->callbacks);
-
-        do {
-            $priority = current($this->iterations[$nesting_level]);
-            foreach ($this->callbacks[$priority] as $the_) {
-                call_user_func_array($the_['function'], $args);
-            }
-        } while (false !== next($this->iterations[$nesting_level]));
-
-        unset($this->iterations[$nesting_level]);
-        --$this->nesting_level;
     }
 
     /**
@@ -378,68 +385,13 @@ class Hook implements \Iterator, \ArrayAccess
      *
      * @since 1.0.0
      */
-    public function current_priority(): false|int
+    public function currentPriority(): false|int
     {
         if (false === current($this->iterations)) {
             return false;
         }
 
         return current(current($this->iterations));
-    }
-
-    /**
-     * Normalizes filters set up before WordPress has initialized to WP_Hook objects.
-     *
-     * The `$filters` parameter should be an array keyed by hook name, with values
-     * containing either:
-     *
-     *  - A `WP_Hook` instance
-     *  - An array of callbacks keyed by their priorities
-     *
-     * Examples:
-     *
-     *     $filters = array(
-     *         'wp_fatal_error_handler_enabled' => array(
-     *             10 => array(
-     *                 array(
-     *                     'accepted_args' => 0,
-     *                     'function'      => function() {
-     *                         return false;
-     *                     },
-     *                 ),
-     *             ),
-     *         ),
-     *     );
-     *
-     * @param array $filters Filters to normalize. See documentation above for details.
-     *
-     * @return Hook[] array of normalized filters
-     *
-     * @since 1.0.0
-     */
-    public static function build_preinitialized_hooks($filters): array
-    {
-        /** @var Hook[] $normalized */
-        $normalized = [];
-
-        foreach ($filters as $tag => $callback_groups) {
-            if ($callback_groups instanceof self) {
-                $normalized[$tag] = $callback_groups;
-                continue;
-            }
-            $hook = new self();
-
-            // Loop through callback groups.
-            foreach ($callback_groups as $priority => $callbacks) {
-                // Loop through callbacks.
-                foreach ($callbacks as $cb) {
-                    $hook->add_filter($tag, $cb['function'], $priority, $cb['accepted_args']);
-                }
-            }
-            $normalized[$tag] = $hook;
-        }
-
-        return $normalized;
     }
 
     /**
@@ -570,15 +522,15 @@ class Hook implements \Iterator, \ArrayAccess
      * Functions and static method callbacks are just returned as strings and
      * shouldn't have any speed penalty.
      *
-     * @param string                $hook_name Unused. The name of the filter to build ID for.
-     * @param callable|array|string $callback  The callback to generate ID for. The callback may
-     *                                         or may not exist.
+     * @param string                $hookName Unused. The name of the filter to build ID for.
+     * @param callable|array|string $callback The callback to generate ID for. The callback may
+     *                                        or may not exist.
      *
      * @return string unique function ID for usage as array key
      *
      * @since 1.0.0
      */
-    private function build_unique_filter_id(string $hook_name, callable|array|string $callback): string
+    private function buildUniqueFilterId(string $hookName, callable|array|string $callback): string
     {
         if (is_string($callback)) {
             return $callback;

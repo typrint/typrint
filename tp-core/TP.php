@@ -18,6 +18,7 @@ use TP\Cli\Color;
 use TP\DB\DB;
 use TP\DB\Migrator\Migrator;
 use TP\Filesystem\Watcher\Watcher;
+use TP\Hook\Hook;
 use TP\Route\Route;
 use TP\Utils\Async;
 use TP\Utils\Channel;
@@ -36,15 +37,12 @@ class TP
         $channel = new Channel();
         $this->beforeRun();
 
-        // Initialize Database
+        Hook::init();
         DB::init();
-        Migrator::run();
-
-        // Initialize Cache
         Cache::init();
-
-        // Initialize Router
         Route::init();
+
+        Migrator::run();
         Async::run(Route::instance()->listen());
 
         // Listen file changes
