@@ -29,11 +29,15 @@ class Server
     private int $port;
     private \Closure $handler;
 
-    public function __construct(string $address, int $port, $handler)
+    public function __construct(string $address, int $port)
     {
         $this->server = new SwowServer();
         $this->address = $address;
         $this->port = $port;
+    }
+
+    public function setHandler(\Closure $handler): void
+    {
         $this->handler = $handler;
     }
 

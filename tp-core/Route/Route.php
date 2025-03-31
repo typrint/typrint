@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace TP\Route;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TP\Utils\Chi\Router;
 use TP\Utils\Once;
 use TP\Utils\Server;
 
@@ -23,6 +25,7 @@ class Route
 
     private static Once $once;
     private Server $server;
+    private Router $router;
 
     public static function init(): void
     {
@@ -40,19 +43,20 @@ class Route
 
     public function __construct()
     {
-        $this->server = new Server(SERVER_ADDRESS, SERVER_PORT, static function (ServerRequestInterface $request): string {
-            echo sprintf(
-                "%s on %s\n",
-                $request->getMethod(),
-                $request->getUri()->getPath()
-            );
+        $this->router = new Router();
+        // TODO add routers
+        $this->server = new Server(SERVER_ADDRESS, SERVER_PORT);
+    }
 
-            return 'Hello Swow!';
-        });
+    public function handle(): callable
+    {
+        return fn (ServerRequestInterface $request): ResponseInterface => $this->router->handle($request);
     }
 
     public function listen(): callable
     {
+        $this->server->setHandler($this->handle());
+
         return fn () => $this->server->start();
     }
 
