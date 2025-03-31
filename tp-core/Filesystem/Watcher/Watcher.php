@@ -142,10 +142,13 @@ class Watcher
     public function start(): void
     {
         $watcher = $this->getWatchProcess();
+        if (!$watcher->isRunning()) {
+            throw new CouldNotStartWatcherException($watcher->getErrorOutput());
+        }
 
         while (true) {
             if (!$watcher->isRunning()) {
-                throw new CouldNotStartWatcherException($watcher->getErrorOutput());
+                break;
             }
 
             if ($output = $watcher->getIncrementalOutput()) {
