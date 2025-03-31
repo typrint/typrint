@@ -15,7 +15,7 @@ namespace TP;
 
 use TP\Cache\Cache;
 use TP\DB\DB;
-use TP\DB\Migration\Migrator;
+use TP\DB\Migrator\Migrator;
 use TP\Filesystem\Watcher\Watcher;
 use TP\Route\Route;
 use TP\Utils\Async;

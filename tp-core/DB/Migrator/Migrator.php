@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that is with this source code in the file LICENSE.
  */
 
-namespace TP\DB\Migration;
+namespace TP\DB\Migrator;
 
 use Phinx\Config\Config;
 use Phinx\Migration\Manager;

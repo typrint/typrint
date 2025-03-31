@@ -11,10 +11,16 @@ declare(strict_types=1);
  * that is with this source code in the file LICENSE.
  */
 
-namespace TP;
+namespace TP\Hook;
+
+use TP\Utils\Once;
 
 class Hook implements \Iterator, \ArrayAccess
 {
+    private static Hook $instance;
+
+    private static Once $once;
+
     /**
      * Hook callbacks.
      *
@@ -49,6 +55,20 @@ class Hook implements \Iterator, \ArrayAccess
      * @since 1.0.0
      */
     private bool $doing_action = false;
+
+    public static function init(): void
+    {
+        self::$once = new Once();
+    }
+
+    public static function instance(): self
+    {
+        if (!isset(self::$instance)) {
+            self::$once->do(fn () => self::$instance = new self());
+        }
+
+        return self::$instance;
+    }
 
     /**
      * Hooks a function or method to a specific filter action.

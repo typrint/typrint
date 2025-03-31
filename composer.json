@@ -12,7 +12,10 @@
             "TP\\Admin\\": "tp-admin/",
             "TP\\Content\\Plugins\\": "tp-content/plugins/",
             "TP\\Content\\Themes\\": "tp-content/themes/"
-        }
+        },
+        "exclude-from-classmap": [
+            "tp-core/DB/Migrator/migrations"
+        ]
     },
     "authors": [
         {
