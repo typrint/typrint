@@ -51,6 +51,14 @@ return (new Config())
         'multiline_comment_opening_closing' => true,
         'single_blank_line_at_eof' => true,
         'no_empty_phpdoc' => true,
+        'phpdoc_order' => [
+            'order' => ['param',  'return', 'throws', 'since', 'deprecated', 'see'],
+        ],
+        'phpdoc_param_order' => true,
+        'phpdoc_var_annotation_correct_order' => true,
+        'phpdoc_add_missing_param_annotation' => [
+            'only_untyped' => false,
+        ],
 
         'native_constant_invocation' => false,
         'native_function_invocation' => false,

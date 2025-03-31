@@ -69,6 +69,8 @@ class Router implements RequestHandlerInterface
 
     /**
      * Add middleware to the router.
+     *
+     * @param callable[] $middlewares
      */
     public function use(callable ...$middlewares): self
     {
@@ -201,6 +203,8 @@ class Router implements RequestHandlerInterface
 
     /**
      * With creates a new router with the added middleware.
+     *
+     * @param callable[] $middlewares
      */
     public function with(callable ...$middlewares): self
     {

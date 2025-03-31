@@ -114,6 +114,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * @param array $values
+     *
      * @throws \Throwable
      */
     public function raw(string $sql, ...$values): ConnectionInterface
@@ -126,6 +128,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * @param array $values
+     *
      * @throws \Throwable
      */
     public function exec(string $sql, ...$values): ConnectionInterface

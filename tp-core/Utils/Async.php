@@ -94,6 +94,8 @@ class Async
 
     /**
      * Resume execution.
+     *
+     * @param array $data
      */
     public function resume(mixed ...$data): mixed
     {

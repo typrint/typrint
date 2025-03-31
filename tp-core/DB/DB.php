@@ -159,6 +159,8 @@ class DB
     /**
      * Run query.
      *
+     * @param array $values
+     *
      * @throws \Throwable
      */
     public function raw(string $sql, ...$values): ConnectionInterface
@@ -168,6 +170,8 @@ class DB
 
     /**
      * Execute query.
+     *
+     * @param array $values
      *
      * @throws \Throwable
      */
