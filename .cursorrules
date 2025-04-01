@@ -2,7 +2,7 @@
 TyPrint 设计为类 WordPress 的高性能 CMS 系统，使用 Swow 进行基于协程的 PHP 开发。
 TyPrint 希望保留 WordPress 的插件、主题、分类法、自定义文章类型等特性，但采用 PSR-4 标准组织代码，遵循 PSR-12 标准编写代码。
 TyPrint 使用 Bootstrap 5 作为前端框架，使用 jQuery 作为 JavaScript 框架，使用 github.com/Tencent/cherry-markdown 作为编辑器。
-始终使用最新稳定版本的 PHP（8.3 或更新版本），并熟悉 WordPress 开发原则、PSR 标准、最佳实践和 PHP 语言习惯用法。
+始终使用最新稳定版本的 PHP（8.3 或更新版本），并熟悉 PSR 标准、最佳实践和 PHP 语言习惯用法。
 
 - 严格按照用户要求一字不差地执行。
 - 首先进行逐步思考 - 详细描述你的开发计划，用伪代码详细写出。
@@ -15,10 +15,10 @@ TyPrint 使用 Bootstrap 5 作为前端框架，使用 jQuery 作为 JavaScript 
 - 编写代码时在对性能有益时充分利用 Swow 的协程特性。
 - 包含必要的导入、命名空间声明和任何必需的设置代码。
 - 在编写的代码实现中不留任何待办事项、占位符或缺失部分。
-- 解释时简明扼要，但为复杂逻辑或 PHP 特定习惯用法提供简短注释。
+- 解释时简明扼要，但为每个函数名、方法名和类变量编写 WordPress 风格的注释，注释必须使用英文。
 - 如果对最佳实践或实现细节不确定，请说明而不是猜测。
 
-在 API 设计和实现中始终优先考虑安全性、可扩展性和可维护性。利用 Go 的强大功能和简洁性创建高效且符合语言习惯的 API。
+在 TyPrint 设计和实现中始终优先考虑安全性、可扩展性和可维护性。利用 Swow 的强大功能和简洁性创建高效且符合语言习惯的 TyPrint。
 
 项目结构
 
@@ -31,13 +31,14 @@ TyPrint 使用 Bootstrap 5 作为前端框架，使用 jQuery 作为 JavaScript 
 ├── tp-content/ 内容模块
 │   |── plugins/ 用户安装的插件
 │   └── themes/ 用户安装的主题
-├── tp-core/ 核心模块
+├── tp-core/ 核心模块/
+|   ├── Asset/ 资源加载 API
 │   ├── Cache/ 缓存 API
 │   ├── Cli/ 命令行 API
 │   ├── Context/ 上下文 API
 │   ├── Cron/ 计划任务 API
 │   ├── DB/ 数据库 API
-│   ├── Facades/ API 门面
+│   ├── Facades/ API 门面（API 在此定义）
 │   ├── Filesystem/ 文件系统 API
 │   ├── Hook/ 钩子 API
 │   ├── Http/ HTTP 请求 API

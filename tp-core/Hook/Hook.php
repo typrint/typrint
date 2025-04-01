@@ -311,14 +311,14 @@ class Hook implements \Iterator, \ArrayAccess
      *
      * @param string $tag   The name of the filter hook
      * @param mixed  $value The value to filter
-     * @param array  $args  Additional parameters to pass to the callback functions.
+     * @param mixed  $args  Additional parameters to pass to the callback functions.
      *                      This array is expected to include $value at index 0.
      *
      * @return mixed the filtered value after all hooked functions are applied to it
      *
      * @since 1.0.0
      */
-    public function applyFilter(string $tag, mixed $value, array $args = []): mixed
+    public function applyFilter(string $tag, mixed $value, mixed ...$args): mixed
     {
         array_unshift($args, $value);
 
@@ -367,10 +367,10 @@ class Hook implements \Iterator, \ArrayAccess
      *
      * @since 1.0.0
      */
-    public function doAction(string $tag, array $args = []): void
+    public function doAction(string $tag, mixed ...$args): void
     {
         $this->doingAction = true;
-        $this->applyFilter($tag, '', $args);
+        $this->applyFilter($tag, '', ...$args);
 
         // If there are recursive calls to the current action, we haven't finished it until we get to the last one.
         if (!$this->nestingLevel) {

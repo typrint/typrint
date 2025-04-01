@@ -22,8 +22,8 @@ use TP\Hook\Hook as HookManager;
  * @method static bool|int  hasFilter(string $tag = '', callable|false $functionToCheck = false)                       Check if a filter hook exists
  * @method static bool      hasFilters()                                                                               Check if any filter hooks exist
  * @method static void      removeAllFilters(false|int $priority = false)                                              Remove all filter hooks
- * @method static mixed     applyFilter(string $tag, mixed $value, array $args = [])                                   Apply filter hooks
- * @method static void      doAction(string $tag, array $args = [])                                                    Execute action hooks
+ * @method static mixed     applyFilter(string $tag, mixed $value, mixed ...$args)                                     Apply filter hooks
+ * @method static void      doAction(string $tag, mixed ...$args)                                                      Execute action hooks
  * @method static false|int currentPriority()                                                                          Get the priority of the currently running hook
  */
 class Hook extends Facade
