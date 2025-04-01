@@ -14,8 +14,7 @@
             "TP\\Content\\Themes\\": "tp-content/themes/"
         },
         "files": [
-            "tp-core/functions.php",
-            "tp-core/formatting.php"
+            "tp-core/functions.php"
         ],
         "exclude-from-classmap": [
             "tp-core/DB/Migrator/migrations"

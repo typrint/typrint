@@ -12,6 +12,7 @@ declare(strict_types=1);
  */
 
 use TP\Facades\Hook;
+use TP\Formatting\Formatting;
 
 /**
  * Converts float number to format based on the locale.
@@ -241,8 +242,8 @@ function add_query_arg(...$args): string
     }
 
     $qs = [];
-    tp_parse_str($query, $qs);
-    $qs = urlencode_deep($qs); // This re-URL-encodes things that were already in the query string.
+    Formatting::tp_parse_str($query, $qs);
+    $qs = Formatting::urlencode_deep($qs); // This re-URL-encodes things that were already in the query string.
     if (is_array($args[0])) {
         foreach ($args[0] as $k => $v) {
             $qs[$k] = $v;
