@@ -19,6 +19,90 @@ use TP\L10n\L10n;
 class Formatting
 {
     /**
+     * Converts float number to format based on the locale.
+     *
+     * @param float $number   the number to convert based on locale
+     * @param int   $decimals Optional. Precision of the number of decimal places. Default 0.
+     *
+     * @return string converted number in string format
+     *
+     * @since 1.0.0
+     */
+    public static function number_format_i18n(float $number, int $decimals = 0): string
+    {
+        $formatted = number_format($number, abs($decimals));
+
+        /**
+         * Filters the number formatted based on the locale.
+         *
+         * @param string $formatted converted number in string format
+         * @param float  $number    the number to convert based on locale
+         * @param int    $decimals  precision of the number of decimal places
+         *
+         * @since 1.0.0
+         */
+        return Hook::applyFilter('number_format_i18n', $formatted, $number, $decimals);
+    }
+
+    /**
+     * Converts a number of bytes to the largest unit the bytes will fit into.
+     *
+     * It is easier to read 1 KB than 1024 bytes and 1 MB than 1048576 bytes. Converts
+     * number of bytes to human readable number by taking the number of that unit
+     * that the bytes will go into it. Supports YB value.
+     *
+     * Please note that integers in PHP are limited to 32 bits, unless they are on
+     * 64 bit architecture, then they have 64 bit size. If you need to place the
+     * larger size then what PHP integer type will hold, then use a string. It will
+     * be converted to a double, which should always have 64 bit length.
+     *
+     * Technically the correct unit names for powers of 1024 are KiB, MiB etc.
+     *
+     * @param int|string $bytes    Number of bytes. Note max integer size for integers.
+     * @param int        $decimals Optional. Precision of number of decimal places. Default 0.
+     *
+     * @return string|false number string on success, false on failure
+     *
+     * @since 1.0.0
+     */
+    public static function size_format(int|string $bytes, int $decimals = 0): false|string
+    {
+        $quant = [
+            /* translators: Unit symbol for yottabyte. */
+            L10n::_x('YB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+            /* translators: Unit symbol for zettabyte. */
+            L10n::_x('ZB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+            /* translators: Unit symbol for exabyte. */
+            L10n::_x('EB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+            /* translators: Unit symbol for petabyte. */
+            L10n::_x('PB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024,
+            /* translators: Unit symbol for terabyte. */
+            L10n::_x('TB', 'unit symbol') => 1024 * 1024 * 1024 * 1024,
+            /* translators: Unit symbol for gigabyte. */
+            L10n::_x('GB', 'unit symbol') => 1024 * 1024 * 1024,
+            /* translators: Unit symbol for megabyte. */
+            L10n::_x('MB', 'unit symbol') => 1024 * 1024,
+            /* translators: Unit symbol for kilobyte. */
+            L10n::_x('KB', 'unit symbol') => 1024,
+            /* translators: Unit symbol for byte. */
+            L10n::_x('B', 'unit symbol') => 1,
+        ];
+
+        if (0 === $bytes) {
+            /* translators: Unit symbol for byte. */
+            return self::number_format_i18n(0, $decimals).' '.L10n::_x('B', 'unit symbol');
+        }
+
+        foreach ($quant as $unit => $mag) {
+            if ((float) $bytes >= $mag) {
+                return self::number_format_i18n($bytes / $mag, $decimals).' '.$unit;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Checks to see if a string is utf8 encoded.
      *
      * NOTE: This function checks for 5-Byte sequences, UTF8

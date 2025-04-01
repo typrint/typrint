@@ -12,166 +12,25 @@ declare(strict_types=1);
  */
 
 use TP\Facades\Hook;
-use TP\Formatting\Formatting;
 use TP\L10n\L10n;
-
-/**
- * Converts float number to format based on the locale.
- *
- * @param float $number   the number to convert based on locale
- * @param int   $decimals Optional. Precision of the number of decimal places. Default 0.
- *
- * @return string converted number in string format
- *
- * @since 1.0.0
- */
-function number_format_i18n(float $number, int $decimals = 0): string
-{
-    $formatted = number_format($number, abs($decimals));
-
-    /**
-     * Filters the number formatted based on the locale.
-     *
-     * @param string $formatted converted number in string format
-     * @param float  $number    the number to convert based on locale
-     * @param int    $decimals  precision of the number of decimal places
-     *
-     * @since 1.0.0
-     */
-    return Hook::applyFilter('number_format_i18n', $formatted, $number, $decimals);
-}
-
-/**
- * Converts a number of bytes to the largest unit the bytes will fit into.
- *
- * It is easier to read 1 KB than 1024 bytes and 1 MB than 1048576 bytes. Converts
- * number of bytes to human readable number by taking the number of that unit
- * that the bytes will go into it. Supports YB value.
- *
- * Please note that integers in PHP are limited to 32 bits, unless they are on
- * 64 bit architecture, then they have 64 bit size. If you need to place the
- * larger size then what PHP integer type will hold, then use a string. It will
- * be converted to a double, which should always have 64 bit length.
- *
- * Technically the correct unit names for powers of 1024 are KiB, MiB etc.
- *
- * @param int|string $bytes    Number of bytes. Note max integer size for integers.
- * @param int        $decimals Optional. Precision of number of decimal places. Default 0.
- *
- * @return string|false number string on success, false on failure
- *
- * @since 1.0.0
- */
-function size_format(int|string $bytes, int $decimals = 0): false|string
-{
-    $quant = [
-        /* translators: Unit symbol for yottabyte. */
-        L10n::_x('YB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
-        /* translators: Unit symbol for zettabyte. */
-        L10n::_x('ZB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
-        /* translators: Unit symbol for exabyte. */
-        L10n::_x('EB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
-        /* translators: Unit symbol for petabyte. */
-        L10n::_x('PB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024,
-        /* translators: Unit symbol for terabyte. */
-        L10n::_x('TB', 'unit symbol') => 1024 * 1024 * 1024 * 1024,
-        /* translators: Unit symbol for gigabyte. */
-        L10n::_x('GB', 'unit symbol') => 1024 * 1024 * 1024,
-        /* translators: Unit symbol for megabyte. */
-        L10n::_x('MB', 'unit symbol') => 1024 * 1024,
-        /* translators: Unit symbol for kilobyte. */
-        L10n::_x('KB', 'unit symbol') => 1024,
-        /* translators: Unit symbol for byte. */
-        L10n::_x('B', 'unit symbol') => 1,
-    ];
-
-    if (0 === $bytes) {
-        /* translators: Unit symbol for byte. */
-        return number_format_i18n(0, $decimals).' '.L10n::_x('B', 'unit symbol');
-    }
-
-    foreach ($quant as $unit => $mag) {
-        if ((float) $bytes >= $mag) {
-            return number_format_i18n($bytes / $mag, $decimals).' '.$unit;
-        }
-    }
-
-    return false;
-}
 
 /**
  * Builds URL query based on an associative and, or indexed array.
  *
  * This is a convenient function for easily building url queries. It sets the
- * separator to '&' and uses _http_build_query() function.
+ * separator to '&' and uses http_build_query() function.
  *
  * @param array $data URL-encode key/value pairs
  *
  * @return string URL-encoded string
  *
  * @since 1.0.0
- * @see _http_build_query() Used to build the query
  * @see https://www.php.net/manual/en/function.http-build-query.php for more on what
  *       http_build_query() does.
  */
 function build_query(array $data): string
 {
-    return _http_build_query($data, null, '&', '', false);
-}
-
-/**
- * From php.net (modified by Mark Jaquith to behave like the native PHP5 function).
- *
- * @param object|array $data      An array or object of data. Converted to array.
- * @param string|null  $prefix    Optional. Numeric index. If set, start parameter numbering with it.
- *                                Default null.
- * @param string|null  $sep       Optional. Argument separator; defaults to 'arg_separator.output'.
- *                                Default null.
- * @param string       $key       Optional. Used to prefix key name. Default empty string.
- * @param bool         $urlencode Optional. Whether to use urlencode() in the result. Default true.
- *
- * @return string the query string
- *
- * @since 1.0.0
- * @see https://www.php.net/manual/en/function.http-build-query.php
- */
-function _http_build_query(object|array $data, ?string $prefix = null, ?string $sep = null, string $key = '', bool $urlencode = true): string
-{
-    $ret = [];
-
-    foreach ((array) $data as $k => $v) {
-        if ($urlencode) {
-            $k = urlencode($k);
-        }
-
-        if (is_int($k) && null !== $prefix) {
-            $k = $prefix.$k;
-        }
-
-        if (!empty($key)) {
-            $k = $key.'%5B'.$k.'%5D';
-        }
-
-        if (null === $v) {
-            continue;
-        } elseif (false === $v) {
-            $v = '0';
-        }
-
-        if (is_array($v) || is_object($v)) {
-            $ret[] = _http_build_query($v, '', $sep, $k, $urlencode);
-        } elseif ($urlencode) {
-            $ret[] = $k.'='.urlencode($v);
-        } else {
-            $ret[] = $k.'='.$v;
-        }
-    }
-
-    if (null === $sep) {
-        $sep = ini_get('arg_separator.output');
-    }
-
-    return implode($sep, $ret);
+    return http_build_query($data);
 }
 
 /**
@@ -200,7 +59,7 @@ function _http_build_query(object|array $data, ?string $prefix = null, ?string $
  * late-escaped with esc_url() or similar to help prevent vulnerability to cross-site scripting
  * (XSS) attacks.
  *
- * @param array $args
+ * @param array{0: string|array, 1: string, 2:string} $args
  *
  * @return string new URL query string (unescaped)
  *
@@ -209,64 +68,76 @@ function _http_build_query(object|array $data, ?string $prefix = null, ?string $
 function add_query_arg(...$args): string
 {
     if (is_array($args[0])) {
-        $uri = $args[1];
+        $new_args = $args[0];
+        $uri = $args[1] ?? '';
     } else {
-        $uri = $args[2];
+        $new_args = [$args[0] => $args[1]];
+        $uri = $args[2] ?? '';
     }
 
-    $frag = strstr($uri, '#');
-    if ($frag) {
-        $uri = substr($uri, 0, -strlen($frag));
-    } else {
-        $frag = '';
+    $parts = parse_url($uri);
+
+    $result = '';
+    if (isset($parts['scheme'])) {
+        $result .= $parts['scheme'].'://';
+    }
+    if (isset($parts['host'])) {
+        $result .= $parts['host'];
+    }
+    if (isset($parts['port'])) {
+        $result .= ':'.$parts['port'];
+    }
+    if (isset($parts['path'])) {
+        $result .= $parts['path'];
     }
 
-    if (str_starts_with($uri, 'http://')) {
-        $protocol = 'http://';
-        $uri = substr($uri, 7);
-    } elseif (str_starts_with($uri, 'https://')) {
-        $protocol = 'https://';
-        $uri = substr($uri, 8);
-    } else {
-        $protocol = '';
+    $query = [];
+    if (isset($parts['query'])) {
+        parse_str($parts['query'], $query);
     }
-
-    if (str_contains($uri, '?')) {
-        [$base, $query] = explode('?', $uri, 2);
-        $base .= '?';
-    } elseif ($protocol || !str_contains($uri, '=')) {
-        $base = $uri.'?';
-        $query = '';
-    } else {
-        $base = '';
-        $query = $uri;
-    }
-
-    $qs = [];
-    Formatting::tp_parse_str($query, $qs);
-    $qs = Formatting::urlencode_deep($qs); // This re-URL-encodes things that were already in the query string.
-    if (is_array($args[0])) {
-        foreach ($args[0] as $k => $v) {
-            $qs[$k] = $v;
-        }
-    } else {
-        $qs[$args[0]] = $args[1];
-    }
-
-    foreach ($qs as $k => $v) {
-        if (false === $v) {
-            unset($qs[$k]);
+    foreach ($new_args as $key => $value) {
+        if (false === $value) {
+            unset($query[$key]);
+        } else {
+            $query[$key] = $value;
         }
     }
+    $new_query = $query ? '?'.http_build_query($query) : '';
+    $result .= $new_query;
 
-    $ret = build_query($qs);
-    $ret = trim($ret, '?');
-    $ret = preg_replace('#=(&|$)#', '$1', $ret);
-    $ret = $protocol.$base.$ret.$frag;
-    $ret = rtrim($ret, '?');
-    $ret = str_replace('?#', '#', $ret);
+    if (isset($parts['fragment'])) {
+        $result .= '#'.$parts['fragment'];
+    }
 
-    return $ret;
+    return $result;
+}
+
+/**
+ * Removes an item or items from a query string.
+ *
+ * Important: The return value of remove_query_arg() is not escaped by default. Output should be
+ * late-escaped with esc_url() or similar to help prevent vulnerability to cross-site scripting
+ * (XSS) attacks.
+ *
+ * @param string|string[] $key query key or keys to remove
+ * @param string          $url the URL to modify
+ *
+ * @return false|string new URL query string
+ *
+ * @since 1.0.0
+ */
+function remove_query_arg(array|string $key, string $url): false|string
+{
+    if (is_array($key)) { // Removing multiple keys.
+        $query = [];
+        foreach ($key as $k) {
+            $query[$k] = false;
+        }
+
+        return add_query_arg($query, $url);
+    }
+
+    return add_query_arg($key, false, $url);
 }
 
 /**
@@ -595,12 +466,12 @@ function get_allowed_mime_types(): array
     unset($t['swf'], $t['exe']);
     unset($t['htm|html'], $t['js']);
 
-    /*
+    /**
      * Filters the list of allowed mime types and file extensions.
      *
-     * @since 1.0.0
+     * @param array $t mime types keyed by the file extension regex corresponding to those types
      *
-     * @param array $t Mime types keyed by the file extension regex corresponding to those types.
+     * @since 1.0.0
      */
     return Hook::applyFilter('upload_mimes', $t);
 }
@@ -653,16 +524,16 @@ function tp_is_heic_image_mime_type(string $mime_type): bool
  */
 function tp_get_mime_types(): array
 {
-    /*
+    /**
      * Filters the list of mime types and file extensions.
      *
      * This filter should be used to add, not remove, mime types. To remove
      * mime types, use the {@see 'upload_mimes'} filter.
      *
-     * @since 1.0.0
+     * @param string[] $tp_get_mime_types mime types keyed by the file extension regex
+     *                                    corresponding to those types
      *
-     * @param string[] $tp_get_mime_types Mime types keyed by the file extension regex
-     *                                    corresponding to those types.
+     * @since 1.0.0
      */
     return Hook::applyFilter(
         'mime_types',
@@ -790,14 +661,13 @@ function tp_get_mime_types(): array
  */
 function tp_get_ext_types(): array
 {
-    /*
+    /**
      * Filters file type based on the extension name.
      *
+     * @param array[] $ext2type multi-dimensional array of file extensions types keyed by the type of file
+     *
      * @since 1.0.0
-     *
      * @see tp_ext2type()
-     *
-     * @param array[] $ext2type Multi-dimensional array of file extensions types keyed by the type of file.
      */
     return Hook::applyFilter(
         'ext_types',
@@ -835,23 +705,23 @@ function tp_get_ext_types(): array
  */
 function tp_deprecated_function(string $function_name, string $version, string $replacement = ''): void
 {
-    /*
+    /**
      * Fires when a deprecated function is called.
      *
-     * @since 1.0.0
+     * @param string $function_name the function that was called
+     * @param string $replacement   the function that should have been called
+     * @param string $version       the version of TyPrint that deprecated the function
      *
-     * @param string $function_name The function that was called.
-     * @param string $replacement   The function that should have been called.
-     * @param string $version       The version of TyPrint that deprecated the function.
+     * @since 1.0.0
      */
     Hook::doAction('deprecated_function_run', $function_name, $replacement, $version);
 
-    /*
+    /**
      * Filters whether to trigger an error for deprecated functions.
      *
-     * @since 1.0.0
-     *
      * @param bool $trigger Whether to trigger the error for deprecated functions. Default true.
+     *
+     * @since 1.0.0
      */
     if (TP_DEBUG && Hook::applyFilter('deprecated_function_trigger_error', true)) {
         if (function_exists('__')) {
@@ -924,14 +794,14 @@ function tp_deprecated_constructor(string $class_name, string $version, string $
      */
     Hook::doAction('deprecated_constructor_run', $class_name, $version, $parent_class);
 
-    /*
+    /**
      * Filters whether to trigger an error for deprecated functions.
      *
      * `TP_DEBUG` must be true in addition to the filter evaluating to true.
      *
-     * @since 1.0.0
-     *
      * @param bool $trigger Whether to trigger the error for deprecated functions. Default true.
+     *
+     * @since 1.0.0
      */
     if (TP_DEBUG && Hook::applyFilter('deprecated_constructor_trigger_error', true)) {
         if (function_exists('__')) {
@@ -1009,12 +879,12 @@ function tp_deprecated_class(string $class_name, string $version, string $replac
      */
     Hook::doAction('deprecated_class_run', $class_name, $replacement, $version);
 
-    /*
+    /**
      * Filters whether to trigger an error for a deprecated class.
      *
-     * @since 1.0.0
-     *
      * @param bool $trigger Whether to trigger an error for a deprecated class. Default true.
+     *
+     * @since 1.0.0
      */
     if (TP_DEBUG && Hook::applyFilter('deprecated_class_trigger_error', true)) {
         if (function_exists('__')) {
@@ -1089,12 +959,12 @@ function tp_deprecated_file(string $file, string $version, string $replacement =
      */
     Hook::doAction('deprecated_file_included', $file, $replacement, $version, $message);
 
-    /*
+    /**
      * Filters whether to trigger an error for deprecated files.
      *
-     * @since 1.0.0
-     *
      * @param bool $trigger Whether to trigger the error for deprecated files. Default true.
+     *
+     * @since 1.0.0
      */
     if (TP_DEBUG && Hook::applyFilter('deprecated_file_trigger_error', true)) {
         $message = empty($message) ? '' : ' '.$message;
@@ -1176,12 +1046,12 @@ function tp_deprecated_argument(string $function_name, string $version, string $
      */
     Hook::doAction('deprecated_argument_run', $function_name, $message, $version);
 
-    /*
+    /**
      * Filters whether to trigger an error for deprecated arguments.
      *
-     * @since 1.0.0
-     *
      * @param bool $trigger Whether to trigger the error for deprecated arguments. Default true.
+     *
+     * @since 1.0.0
      */
     if (TP_DEBUG && Hook::applyFilter('deprecated_argument_trigger_error', true)) {
         if (function_exists('__')) {
@@ -1253,13 +1123,13 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
      */
     Hook::doAction('deprecated_hook_run', $hook, $replacement, $version, $message);
 
-    /*
+    /**
      * Filters whether to trigger deprecated hook errors.
-     *
-     * @since 1.0.0
      *
      * @param bool $trigger Whether to trigger deprecated hook errors. Requires
      *                      `TP_DEBUG` to be defined true.
+     *
+     * @since 1.0.0
      */
     if (TP_DEBUG && Hook::applyFilter('deprecated_hook_trigger_error', true)) {
         $message = empty($message) ? '' : ' '.$message;
@@ -1301,7 +1171,7 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
  *
  * @since 1.0.0
  */
-function _doing_it_wrong(string $function_name, string $message, string $version): void
+function tp_doing_it_wrong(string $function_name, string $message, string $version): void
 {
     /**
      * Fires when the given function is being used incorrectly.
@@ -1315,12 +1185,12 @@ function _doing_it_wrong(string $function_name, string $message, string $version
     Hook::doAction('doing_it_wrong_run', $function_name, $message, $version);
 
     /**
-     * Filters whether to trigger an error for _doing_it_wrong() calls.
+     * Filters whether to trigger an error for tp_doing_it_wrong() calls.
      *
      * @param string $function_name the function that was called
      * @param string $message       a message explaining what has been done incorrectly
      * @param string $version       the version of TyPrint where the message was added
-     * @param bool   $trigger       Whether to trigger the error for _doing_it_wrong() calls. Default true.
+     * @param bool   $trigger       Whether to trigger the error for tp_doing_it_wrong() calls. Default true.
      *
      * @since 1.0.0
      */
@@ -1556,7 +1426,7 @@ function tp_is_uuid(mixed $uuid, ?int $version = null): bool
 
     if (is_numeric($version)) {
         if (4 !== (int) $version) {
-            // _doing_it_wrong( __FUNCTION__, __( 'Only UUID V4 is supported at this time.' ), '4.9.0' );
+            // tp_doing_it_wrong( __FUNCTION__, __( 'Only UUID V4 is supported at this time.' ), '4.9.0' );
             return false;
         }
         $regex = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/';
@@ -1714,16 +1584,16 @@ function tp_check_password(
         $check = password_verify($password, $hash);
     }
 
-    /*
+    /**
      * Filters whether the plaintext password matches the hashed password.
      *
-     * @since 1.0.0
-     *
-     * @param bool       $check    Whether the passwords match.
-     * @param string     $password The plaintext password.
-     * @param string     $hash     The hashed password.
+     * @param bool       $check    whether the passwords match
+     * @param string     $password the plaintext password
+     * @param string     $hash     the hashed password
      * @param string|int $user_id  Optional ID of a user associated with the password.
      *                             Can be empty.
+     *
+     * @since 1.0.0
      */
     return Hook::applyFilter('check_password', $check, $password, $hash, $user_id);
 }
@@ -1758,14 +1628,14 @@ function tp_password_needs_rehash(string $hash, int|string $user_id = ''): bool
 
     $needs_rehash = password_needs_rehash($hash, $algorithm, $options);
 
-    /*
+    /**
      * Filters whether the password hash needs to be rehashed.
      *
-     * @since 1.0.0
-     *
-     * @param bool       $needs_rehash Whether the password hash needs to be rehashed.
-     * @param string     $hash         The password hash.
+     * @param bool       $needs_rehash whether the password hash needs to be rehashed
+     * @param string     $hash         the password hash
      * @param string|int $user_id      Optional. ID of a user associated with the password.
+     *
+     * @since 1.0.0
      */
     return Hook::applyFilter('password_needs_rehash', $needs_rehash, $hash, $user_id);
 }
@@ -1846,15 +1716,15 @@ function tp_generate_password(int $length = 12, bool $special_chars = true, bool
         $password .= substr($chars, tp_rand(0, strlen($chars) - 1), 1);
     }
 
-    /*
+    /**
      * Filters the randomly-generated password.
      *
-     * @since 1.0.0
+     * @param string $password            the generated password
+     * @param int    $length              the length of password to generate
+     * @param bool   $special_chars       whether to include standard special characters
+     * @param bool   $extra_special_chars whether to include other special characters
      *
-     * @param string $password            The generated password.
-     * @param int    $length              The length of password to generate.
-     * @param bool   $special_chars       Whether to include standard special characters.
-     * @param bool   $extra_special_chars Whether to include other special characters.
+     * @since 1.0.0
      */
     return Hook::applyFilter('random_password', $password, $length, $special_chars, $extra_special_chars);
 }
