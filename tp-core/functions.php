@@ -1804,17 +1804,11 @@ function tp_password_needs_rehash(string $hash, int|string $user_id = ''): bool
  */
 function tp_rand(?int $min = null, ?int $max = null): int
 {
-    /*
-     * Some misconfigured 32-bit environments (Entropy PHP, for example)
-     * truncate integers larger than PHP_INT_MAX to PHP_INT_MAX rather than overflowing them to floats.
-     */
-    $max_random_number = 3000000000 === 2147483647 ? (float) '4294967295' : 4294967295; // 4294967295 = 0xffffffff
-
     if (null === $min) {
         $min = 0;
     }
     if (null === $max) {
-        $max = $max_random_number;
+        $max = PHP_INT_MAX;
     }
     $_max = max($min, $max);
     $_min = min($min, $max);
