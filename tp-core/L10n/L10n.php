@@ -161,22 +161,19 @@ class L10n
      *
      * Example:
      *
-     *     $message = _n_noop( '%s post', '%s posts', 'text-domain' );
-     *     ...
-     *     printf( translate_nooped_plural( $message, $count, 'text-domain' ), number_format_i18n( $count ) );
+     * $message = _n_noop( '%s post', '%s posts', 'text-domain' );
+     * ...
+     * printf( translate_nooped_plural( $message, $count, 'text-domain' ), number_format_i18n( $count ) );
      *
-     * @param array  $nooped_plural {
-     *                              Array that is usually a return value from _n_noop() or _nx_noop()
-     * @param int    $count         number of objects
-     * @param string $domain        Optional. Text domain. Unique identifier for retrieving translated strings. If $nooped_plural contains
-     *                              a text domain passed to _n_noop() or _nx_noop(), it will override this value. Default 'default'.
-     *
-     * @var string      $singular singular form to be localized
-     * @var string      $plural plural form to be localized
-     * @var string|null $context context information for the translators
-     * @var string|null $domain Text domain.
-     *                  }
-     *                  Array that is usually a return value from _n_noop() or _nx_noop()
+     * @param array{
+     *       singular: string,
+     *       plural: string,
+     *       context: null,
+     *       domain: string|null
+     *   } $nooped_plural Array that is usually a return value from _n_noop() or _nx_noop()
+     * @param int    $count  number of objects
+     * @param string $domain Optional. Text domain. Unique identifier for retrieving translated strings. If $nooped_plural contains
+     *                       a text domain passed to _n_noop() or _nx_noop(), it will override this value. Default 'default'.
      *
      * @return string either $singular or $plural translated text
      *
@@ -467,16 +464,9 @@ class L10n
      * @param string|null $domain   Optional. Text domain. Unique identifier for retrieving translated strings.
      *                              Default null.
      *
-     * @return array {
-     *               Array of translation information for the strings
+     * @return array{singular: string, plural: string, context: null, domain: string|null} Array of translation information for the strings
      *
      * @since 1.0.0
-     *
-     * @var string      $singular singular form to be localized
-     * @var string      $plural   plural form to be localized
-     * @var null        $context  context information for the translators
-     * @var string|null $domain   Text domain.
-     *                  }
      */
     public function _n_noop(string $singular, string $plural, ?string $domain = null): array
     {
@@ -510,16 +500,9 @@ class L10n
      * @param string|null $domain   Optional. Text domain. Unique identifier for retrieving translated strings.
      *                              Default null.
      *
-     * @return array {
-     *               Array of translation information for the strings
+     * @return array{singular: string, plural: string, context: null, domain: string|null} Array of translation information for the strings
      *
      * @since 1.0.0
-     *
-     * @var string      $singular singular form to be localized
-     * @var string      $plural   plural form to be localized
-     * @var string      $context  context information for the translators
-     * @var string|null $domain   Text domain.
-     *                  }
      */
     public function _nx_noop(string $singular, string $plural, string $context, ?string $domain = null): array
     {

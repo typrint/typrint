@@ -961,13 +961,13 @@ class Formatting
         $sanitized_key = strtolower($key);
         $sanitized_key = preg_replace('/[^a-z0-9_\-]/', '', $sanitized_key);
 
-        /*
+        /**
          * Filters a sanitized key string.
          *
-         * @since 1.0.0
+         * @param string $sanitized_key sanitized key
+         * @param string $key           the key prior to sanitization
          *
-         * @param string $sanitized_key Sanitized key.
-         * @param string $key           The key prior to sanitization.
+         * @since 1.0.0
          */
         return Hook::applyFilter('sanitize_key', $sanitized_key, $key);
     }
@@ -1177,14 +1177,14 @@ class Formatting
             return self::sanitize_html_class($fallback);
         }
 
-        /*
+        /**
          * Filters a sanitized HTML class string.
          *
-         * @since 1.0.0
+         * @param string $sanitized the sanitized HTML class
+         * @param string $classname HTML class before sanitization
+         * @param string $fallback  the fallback string
          *
-         * @param string $sanitized The sanitized HTML class.
-         * @param string $classname HTML class before sanitization.
-         * @param string $fallback  The fallback string.
+         * @since 1.0.0
          */
         return Hook::applyFilter('sanitize_html_class', $sanitized, $classname, $fallback);
     }
@@ -1203,13 +1203,13 @@ class Formatting
         // Limit to A-Z, a-z, 0-9, '_', '-'.
         $sanitized = preg_replace('/[^A-Za-z0-9_-]/', '', $locale_name);
 
-        /*
+        /**
          * Filters a sanitized locale name string.
          *
-         * @since 1.0.0
+         * @param string $sanitized   the sanitized locale name
+         * @param string $locale_name the locale name before sanitization
          *
-         * @param string $sanitized   The sanitized locale name.
-         * @param string $locale_name The locale name before sanitization.
+         * @since 1.0.0
          */
         return Hook::applyFilter('sanitize_locale_name', $sanitized, $locale_name);
     }
@@ -1326,18 +1326,18 @@ class Formatting
     {
         // Test for the minimum length the email can be.
         if (strlen($email) < 6) {
-            /*
+            /**
              * Filters whether an email address is valid.
              *
              * This filter is evaluated under several different contexts, such as 'email_too_short',
              * 'email_no_at', 'local_invalid_chars', 'domain_period_sequence', 'domain_period_limits',
              * 'domain_no_periods', 'sub_hyphen_limits', 'sub_invalid_chars', or no specific context.
              *
-             * @since 1.0.0
+             * @param string|false $is_email the email address if successfully passed the is_email() checks, false otherwise
+             * @param string       $email    the email address being checked
+             * @param string       $context  context under which the email was tested
              *
-             * @param string|false $is_email The email address if successfully passed the is_email() checks, false otherwise.
-             * @param string       $email    The email address being checked.
-             * @param string       $context  Context under which the email was tested.
+             * @since 1.0.0
              */
             return Hook::applyFilter('is_email', false, $email, 'email_too_short');
         }
@@ -1417,18 +1417,18 @@ class Formatting
     {
         // Test for the minimum length the email can be.
         if (strlen($email) < 6) {
-            /*
+            /**
              * Filters a sanitized email address.
              *
              * This filter is evaluated under several contexts, including 'email_too_short',
              * 'email_no_at', 'local_invalid_chars', 'domain_period_sequence', 'domain_period_limits',
              * 'domain_no_periods', 'domain_no_valid_subs', or no context.
              *
-             * @since 1.0.0
+             * @param string      $sanitized_email the sanitized email address
+             * @param string      $email           the email address, as provided to sanitize_email()
+             * @param string|null $message         A message to pass to the user. null if email is sanitized.
              *
-             * @param string $sanitized_email The sanitized email address.
-             * @param string $email           The email address, as provided to sanitize_email().
-             * @param string|null $message    A message to pass to the user. null if email is sanitized.
+             * @since 1.0.0
              */
             return Hook::applyFilter('sanitize_email', '', $email, 'email_too_short');
         }
@@ -1608,14 +1608,14 @@ class Formatting
             $good_protocol_url = '';
         }
 
-        /*
+        /**
          * Filters a string cleaned and escaped for output as a URL.
          *
-         * @since 1.0.0
+         * @param string $good_protocol_url the cleaned URL to be returned
+         * @param string $original_url      the URL prior to cleaning
+         * @param string $_context          if 'display', replace ampersands and single quotes only
          *
-         * @param string $good_protocol_url The cleaned URL to be returned.
-         * @param string $original_url      The URL prior to cleaning.
-         * @param string $_context          If 'display', replace ampersands and single quotes only.
+         * @since 1.0.0
          */
         return Hook::applyFilter('esc_url', $good_protocol_url, $original_url, $_context);
     }
@@ -1658,16 +1658,16 @@ class Formatting
         $safe_text = str_replace("\r", '', $safe_text);
         $safe_text = str_replace("\n", '\\n', addslashes($safe_text));
 
-        /*
+        /**
          * Filters a string cleaned and escaped for output in JavaScript.
          *
          * Text passed to esc_js() is stripped of invalid or special characters,
          * and properly slashed for output.
          *
-         * @since 1.0.0
+         * @param string $safe_text the text after it has been escaped
+         * @param string $text      the text prior to being escaped
          *
-         * @param string $safe_text The text after it has been escaped.
-         * @param string $text      The text prior to being escaped.
+         * @since 1.0.0
          */
         return Hook::applyFilter('esc_js', $safe_text, $text);
     }
@@ -1682,16 +1682,16 @@ class Formatting
         $safe_text = self::tp_check_invalid_utf8($text);
         $safe_text = self::_tp_specialchars($safe_text, ENT_QUOTES);
 
-        /*
+        /**
          * Filters a string cleaned and escaped for output in HTML.
          *
          * Text passed to esc_html() is stripped of invalid or special characters
          * before output.
          *
-         * @since 1.0.0
+         * @param string $safe_text the text after it has been escaped
+         * @param string $text      the text prior to being escaped
          *
-         * @param string $safe_text The text after it has been escaped.
-         * @param string $text      The text prior to being escaped.
+         * @since 1.0.0
          */
         return Hook::applyFilter('esc_html', $safe_text, $text);
     }
@@ -1706,16 +1706,16 @@ class Formatting
         $safe_text = self::tp_check_invalid_utf8($text);
         $safe_text = self::_tp_specialchars($safe_text, ENT_QUOTES);
 
-        /*
+        /**
          * Filters a string cleaned and escaped for output in an HTML attribute.
          *
          * Text passed to esc_attr() is stripped of invalid or special characters
          * before output.
          *
-         * @since 1.0.0
+         * @param string $safe_text the text after it has been escaped
+         * @param string $text      the text prior to being escaped
          *
-         * @param string $safe_text The text after it has been escaped.
-         * @param string $text      The text prior to being escaped.
+         * @since 1.0.0
          */
         return Hook::applyFilter('esc_attr', $safe_text, $text);
     }
@@ -1729,13 +1729,13 @@ class Formatting
     {
         $safe_text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 
-        /*
+        /**
          * Filters a string cleaned and escaped for output in a textarea element.
          *
-         * @since 1.0.0
+         * @param string $safe_text the text after it has been escaped
+         * @param string $text      the text prior to being escaped
          *
-         * @param string $safe_text The text after it has been escaped.
-         * @param string $text      The text prior to being escaped.
+         * @since 1.0.0
          */
         return Hook::applyFilter('esc_textarea', $safe_text, $text);
     }
@@ -1784,17 +1784,17 @@ class Formatting
             $safe_text
         );
 
-        /*
+        /**
          * Filters a string cleaned and escaped for output in XML.
          *
          * Text passed to esc_xml() is stripped of invalid or special characters
          * before output. HTML named character references are converted to their
          * equivalent code points.
          *
-         * @since 1.0.0
+         * @param string $safe_text the text after it has been escaped
+         * @param string $text      the text prior to being escaped
          *
-         * @param string $safe_text The text after it has been escaped.
-         * @param string $text      The text prior to being escaped.
+         * @since 1.0.0
          */
         return Hook::applyFilter('esc_xml', $safe_text, $text);
     }
@@ -1808,13 +1808,13 @@ class Formatting
     {
         $safe_tag = strtolower(preg_replace('/[^a-zA-Z0-9-_:]/', '', $tag_name));
 
-        /*
+        /**
          * Filters a string cleaned and escaped for output as an HTML tag.
          *
-         * @since 1.0.0
+         * @param string $safe_tag the tag name after it has been escaped
+         * @param string $tag_name the text before it was escaped
          *
-         * @param string $safe_tag The tag name after it has been escaped.
-         * @param string $tag_name The text before it was escaped.
+         * @since 1.0.0
          */
         return Hook::applyFilter('escape_tag', $safe_tag, $tag_name);
     }
@@ -1841,13 +1841,13 @@ class Formatting
     {
         $filtered = self::_sanitize_text_fields($str, false);
 
-        /*
+        /**
          * Filters a sanitized text field string.
          *
-         * @since 1.0.0
+         * @param string $filtered the sanitized string
+         * @param string $str      the string prior to being sanitized
          *
-         * @param string $filtered The sanitized string.
-         * @param string $str      The string prior to being sanitized.
+         * @since 1.0.0
          */
         return Hook::applyFilter('sanitize_text_field', $filtered, $str);
     }
@@ -1870,13 +1870,13 @@ class Formatting
     {
         $filtered = self::_sanitize_text_fields($str, true);
 
-        /*
+        /**
          * Filters a sanitized textarea field string.
          *
-         * @since 1.0.0
+         * @param string $filtered the sanitized string
+         * @param string $str      the string prior to being sanitized
          *
-         * @param string $filtered The sanitized string.
-         * @param string $str      The string prior to being sanitized.
+         * @since 1.0.0
          */
         return Hook::applyFilter('sanitize_textarea_field', $filtered, $str);
     }
@@ -1939,13 +1939,13 @@ class Formatting
     {
         $sani_mime_type = preg_replace('/[^-+*.a-zA-Z0-9\/]/', '', $mime_type);
 
-        /*
+        /**
          * Filters a mime type following sanitization.
          *
-         * @since 1.0.0
+         * @param string $sani_mime_type the sanitized mime type
+         * @param string $mime_type      the mime type prior to sanitization
          *
-         * @param string $sani_mime_type The sanitized mime type.
-         * @param string $mime_type      The mime type prior to sanitization.
+         * @since 1.0.0
          */
         return Hook::applyFilter('sanitize_mime_type', $sani_mime_type, $mime_type);
     }
@@ -1970,16 +1970,16 @@ class Formatting
         $urls_to_ping = array_map('sanitize_url', $urls_to_ping);
         $urls_to_ping = implode("\n", $urls_to_ping);
 
-        /*
+        /**
          * Filters a list of trackback URLs following sanitization.
          *
          * The string returned here consists of a space or carriage return-delimited list
          * of trackback URLs.
          *
-         * @since 1.0.0
+         * @param string $urls_to_ping sanitized space or carriage return separated URLs
+         * @param string $to_ping      space or carriage return separated URLs before sanitization
          *
-         * @param string $urls_to_ping Sanitized space or carriage return separated URLs.
-         * @param string $to_ping      Space or carriage return separated URLs before sanitization.
+         * @since 1.0.0
          */
         return Hook::applyFilter('sanitize_trackback_urls', $urls_to_ping, $to_ping);
     }

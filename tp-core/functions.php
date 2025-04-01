@@ -29,14 +29,14 @@ function number_format_i18n(float $number, int $decimals = 0): string
 {
     $formatted = number_format($number, abs($decimals));
 
-    /*
+    /**
      * Filters the number formatted based on the locale.
      *
-     * @since 1.0.0
+     * @param string $formatted converted number in string format
+     * @param float  $number    the number to convert based on locale
+     * @param int    $decimals  precision of the number of decimal places
      *
-     * @param string $formatted Converted number in string format.
-     * @param float  $number    The number to convert based on locale.
-     * @param int    $decimals  Precision of the number of decimal places.
+     * @since 1.0.0
      */
     return Hook::applyFilter('number_format_i18n', $formatted, $number, $decimals);
 }
@@ -456,28 +456,10 @@ function tp_check_filetype_and_ext(string $file, string $filename, ?array $mimes
     }
 
     // Validate files that didn't get validated during previous checks.
-    if ($type && !$real_mime && extension_loaded('fileinfo')) {
+    if ($type && !$real_mime) {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $real_mime = finfo_file($finfo, $file);
         finfo_close($finfo);
-
-        $google_docs_types = [
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ];
-
-        foreach ($google_docs_types as $google_docs_type) {
-            /*
-             * finfo_file() can return duplicate mime type for Google docs,
-             * this conditional reduces it to a single instance.
-             *
-             * @see https://bugs.php.net/bug.php?id=77784
-             * @see https://core.trac.wordpress.org/ticket/57898
-             */
-            if (2 === substr_count($real_mime, $google_docs_type)) {
-                $real_mime = $google_docs_type;
-            }
-        }
 
         // fileinfo often misidentifies obscure files as one of these types.
         $nonspecific_types = [
@@ -578,24 +560,22 @@ function tp_check_filetype_and_ext(string $file, string $filename, ?array $mimes
         }
     }
 
-    /*
+    /**
      * Filters the "real" file type of the given file.
      *
+     * @param array{
+     *     ext: string|false,
+     *     type: string|false,
+     *     proper_filename: string|false
+     * } $tp_check_filetype_and_ext Values for the extension, mime type, and corrected filename
+     * @param string        $file      full path to the file
+     * @param string        $filename  the name of the file (may differ from $file due to
+     *                                 $file being in a tmp directory)
+     * @param string[]|null $mimes     array of mime types keyed by their file extension regex, or null if
+     *                                 none were provided
+     * @param string|false  $real_mime the actual mime type or false if the type cannot be determined
+     *
      * @since 1.0.0
-     *
-     * @param array         $tp_check_filetype_and_ext {
-     *     Values for the extension, mime type, and corrected filename.
-     *
-     *     @type string|false $ext             File extension, or false if the file doesn't match a mime type.
-     *     @type string|false $type            File mime type, or false if the file doesn't match a mime type.
-     *     @type string|false $proper_filename File name with its correct extension, or false if it cannot be determined.
-     * }
-     * @param string        $file                      Full path to the file.
-     * @param string        $filename                  The name of the file (may differ from $file due to
-     *                                                 $file being in a tmp directory).
-     * @param string[]|null $mimes                     Array of mime types keyed by their file extension regex, or null if
-     *                                                 none were provided.
-     * @param string|false  $real_mime                 The actual mime type or false if the type cannot be determined.
      */
     return Hook::applyFilter('tp_check_filetype_and_ext', compact('ext', 'type', 'proper_filename'), $file, $filename, $mimes, $real_mime);
 }
@@ -620,7 +600,7 @@ function get_allowed_mime_types(): array
      *
      * @since 1.0.0
      *
-     * @param array            $t    Mime types keyed by the file extension regex corresponding to those types.
+     * @param array $t Mime types keyed by the file extension regex corresponding to those types.
      */
     return Hook::applyFilter('upload_mimes', $t);
 }
@@ -846,7 +826,7 @@ function tp_get_ext_types(): array
  * This function is to be used in every function that is deprecated.
  *
  * @param string $function_name the function that was called
- * @param string $version       the version of WordPress that deprecated the function
+ * @param string $version       the version of TyPrint that deprecated the function
  * @param string $replacement   Optional. The function that should have been called. Default empty string.
  *
  * @throws Exception
@@ -862,7 +842,7 @@ function tp_deprecated_function(string $function_name, string $version, string $
      *
      * @param string $function_name The function that was called.
      * @param string $replacement   The function that should have been called.
-     * @param string $version       The version of WordPress that deprecated the function.
+     * @param string $version       The version of TyPrint that deprecated the function.
      */
     Hook::doAction('deprecated_function_run', $function_name, $replacement, $version);
 
@@ -923,7 +903,7 @@ function tp_deprecated_function(string $function_name, string $version, string $
  * This function is to be used in every PHP4-style constructor method that is deprecated.
  *
  * @param string $class_name   the class containing the deprecated constructor
- * @param string $version      the version of WordPress that deprecated the function
+ * @param string $version      the version of TyPrint that deprecated the function
  * @param string $parent_class Optional. The parent class calling the deprecated constructor.
  *                             Default empty string.
  *
@@ -933,14 +913,14 @@ function tp_deprecated_function(string $function_name, string $version, string $
  */
 function tp_deprecated_constructor(string $class_name, string $version, string $parent_class = ''): void
 {
-    /*
+    /**
      * Fires when a deprecated constructor is called.
      *
-     * @since 1.0.0
+     * @param string $class_name   the class containing the deprecated constructor
+     * @param string $version      the version of TyPrint that deprecated the function
+     * @param string $parent_class the parent class calling the deprecated constructor
      *
-     * @param string $class_name   The class containing the deprecated constructor.
-     * @param string $version      The version of WordPress that deprecated the function.
-     * @param string $parent_class The parent class calling the deprecated constructor.
+     * @since 1.0.0
      */
     Hook::doAction('deprecated_constructor_run', $class_name, $version, $parent_class);
 
@@ -1008,7 +988,7 @@ function tp_deprecated_constructor(string $class_name, string $version, string $
  * See {@see tp_deprecated_constructor()} for deprecating PHP4-style constructors.
  *
  * @param string $class_name  the name of the class being instantiated
- * @param string $version     the version of WordPress that deprecated the class
+ * @param string $version     the version of TyPrint that deprecated the class
  * @param string $replacement Optional. The class or function that should have been called.
  *                            Default empty string.
  *
@@ -1018,14 +998,14 @@ function tp_deprecated_constructor(string $class_name, string $version, string $
  */
 function tp_deprecated_class(string $class_name, string $version, string $replacement = ''): void
 {
-    /*
+    /**
      * Fires when a deprecated class is called.
      *
-     * @since 1.0.0
+     * @param string $class_name  the name of the class being instantiated
+     * @param string $replacement the class or function that should have been called
+     * @param string $version     the version of TyPrint that deprecated the class
      *
-     * @param string $class_name  The name of the class being instantiated.
-     * @param string $replacement The class or function that should have been called.
-     * @param string $version     The version of WordPress that deprecated the class.
+     * @since 1.0.0
      */
     Hook::doAction('deprecated_class_run', $class_name, $replacement, $version);
 
@@ -1086,7 +1066,7 @@ function tp_deprecated_class(string $class_name, string $version, string $replac
  * This function is to be used in every file that is deprecated.
  *
  * @param string $file        the file that was included
- * @param string $version     the version of WordPress that deprecated the file
+ * @param string $version     the version of TyPrint that deprecated the file
  * @param string $replacement Optional. The file that should have been included based on ABSPATH.
  *                            Default empty string.
  * @param string $message     Optional. A message regarding the change. Default empty string.
@@ -1097,15 +1077,15 @@ function tp_deprecated_class(string $class_name, string $version, string $replac
  */
 function tp_deprecated_file(string $file, string $version, string $replacement = '', string $message = ''): void
 {
-    /*
+    /**
      * Fires when a deprecated file is called.
      *
-     * @since 1.0.0
+     * @param string $file        the file that was called
+     * @param string $replacement the file that should have been included based on ABSPATH
+     * @param string $version     the version of TyPrint that deprecated the file
+     * @param string $message     a message regarding the change
      *
-     * @param string $file        The file that was called.
-     * @param string $replacement The file that should have been included based on ABSPATH.
-     * @param string $version     The version of WordPress that deprecated the file.
-     * @param string $message     A message regarding the change.
+     * @since 1.0.0
      */
     Hook::doAction('deprecated_file_included', $file, $replacement, $version, $message);
 
@@ -1176,7 +1156,7 @@ function tp_deprecated_file(string $file, string $version, string $replacement =
  * The current behavior is to trigger a user error if TP_DEBUG is true.
  *
  * @param string $function_name the function that was called
- * @param string $version       the version of WordPress that deprecated the argument used
+ * @param string $version       the version of TyPrint that deprecated the argument used
  * @param string $message       Optional. A message regarding the change. Default empty string.
  *
  * @throws Exception
@@ -1185,14 +1165,14 @@ function tp_deprecated_file(string $file, string $version, string $replacement =
  */
 function tp_deprecated_argument(string $function_name, string $version, string $message = ''): void
 {
-    /*
+    /**
      * Fires when a deprecated argument is called.
      *
-     * @since 1.0.0
+     * @param string $function_name the function that was called
+     * @param string $message       a message regarding the change
+     * @param string $version       the version of TyPrint that deprecated the argument used
      *
-     * @param string $function_name The function that was called.
-     * @param string $message       A message regarding the change.
-     * @param string $version       The version of WordPress that deprecated the argument used.
+     * @since 1.0.0
      */
     Hook::doAction('deprecated_argument_run', $function_name, $message, $version);
 
@@ -1251,7 +1231,7 @@ function tp_deprecated_argument(string $function_name, string $version, string $
  * Default behavior is to trigger a user error if `TP_DEBUG` is true.
  *
  * @param string $hook        the hook that was used
- * @param string $version     the version of WordPress that deprecated the hook
+ * @param string $version     the version of TyPrint that deprecated the hook
  * @param string $replacement Optional. The hook that should have been used. Default empty string.
  * @param string $message     Optional. A message regarding the change. Default empty.
  *
@@ -1261,15 +1241,15 @@ function tp_deprecated_argument(string $function_name, string $version, string $
  */
 function tp_deprecated_hook(string $hook, string $version, string $replacement = '', string $message = ''): void
 {
-    /*
+    /**
      * Fires when a deprecated hook is called.
      *
-     * @since 1.0.0
+     * @param string $hook        the hook that was called
+     * @param string $replacement the hook that should be used as a replacement
+     * @param string $version     the version of TyPrint that deprecated the argument used
+     * @param string $message     a message regarding the change
      *
-     * @param string $hook        The hook that was called.
-     * @param string $replacement The hook that should be used as a replacement.
-     * @param string $version     The version of WordPress that deprecated the argument used.
-     * @param string $message     A message regarding the change.
+     * @since 1.0.0
      */
     Hook::doAction('deprecated_hook_run', $hook, $replacement, $version, $message);
 
@@ -1286,7 +1266,7 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
 
         if ($replacement) {
             $message = sprintf(
-                /* translators: 1: WordPress hook name, 2: Version number, 3: Alternative hook name. */
+                /* translators: 1: TyPrint hook name, 2: Version number, 3: Alternative hook name. */
                 L10n::__('Hook %1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.'),
                 $hook,
                 $version,
@@ -1294,7 +1274,7 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
             ).$message;
         } else {
             $message = sprintf(
-                /* translators: 1: WordPress hook name, 2: Version number. */
+                /* translators: 1: TyPrint hook name, 2: Version number. */
                 L10n::__('Hook %1$s is <strong>deprecated</strong> since version %2$s with no alternative available.'),
                 $hook,
                 $version
@@ -1315,7 +1295,7 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
  *
  * @param string $function_name the function that was called
  * @param string $message       a message explaining what has been done incorrectly
- * @param string $version       the version of WordPress where the message was added
+ * @param string $version       the version of TyPrint where the message was added
  *
  * @throws Exception
  *
@@ -1323,14 +1303,14 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
  */
 function _doing_it_wrong(string $function_name, string $message, string $version): void
 {
-    /*
+    /**
      * Fires when the given function is being used incorrectly.
      *
-     * @since 1.0.0
+     * @param string $function_name the function that was called
+     * @param string $message       a message explaining what has been done incorrectly
+     * @param string $version       the version of TyPrint where the message was added
      *
-     * @param string $function_name The function that was called.
-     * @param string $message       A message explaining what has been done incorrectly.
-     * @param string $version       The version of WordPress where the message was added.
+     * @since 1.0.0
      */
     Hook::doAction('doing_it_wrong_run', $function_name, $message, $version);
 
@@ -1339,7 +1319,7 @@ function _doing_it_wrong(string $function_name, string $message, string $version
      *
      * @param string $function_name the function that was called
      * @param string $message       a message explaining what has been done incorrectly
-     * @param string $version       the version of WordPress where the message was added
+     * @param string $version       the version of TyPrint where the message was added
      * @param bool   $trigger       Whether to trigger the error for _doing_it_wrong() calls. Default true.
      *
      * @since 1.0.0
@@ -1353,12 +1333,12 @@ function _doing_it_wrong(string $function_name, string $message, string $version
 
             $message .= ' '.sprintf(
                 /* translators: %s: Documentation URL. */
-                L10n::__('Please see <a href="%s">Debugging in WordPress</a> for more information.'),
+                L10n::__('Please see <a href="%s">Debugging in TyPrint</a> for more information.'),
                 L10n::__('https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/')
             );
 
             $message = sprintf(
-                /* translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: WordPress version number. */
+                /* translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: TyPrint version number. */
                 L10n::__('Function %1$s was called <strong>incorrectly</strong>. %2$s %3$s'),
                 $function_name,
                 $message,
@@ -1370,7 +1350,7 @@ function _doing_it_wrong(string $function_name, string $message, string $version
             }
 
             $message .= sprintf(
-                ' Please see <a href="%s">Debugging in WordPress</a> for more information.',
+                ' Please see <a href="%s">Debugging in TyPrint</a> for more information.',
                 'https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/'
             );
 
@@ -1411,16 +1391,16 @@ function tp_trigger_error(string $function_name, string $message, int $error_lev
         return;
     }
 
-    /*
+    /**
      * Fires when the given function triggers a user-level error/warning/notice/deprecation message.
      *
      * Can be used for debug backtracking.
      *
-     * @since 1.0.0
+     * @param string $function_name the function that was called
+     * @param string $message       a message explaining what has been done incorrectly
+     * @param int    $error_level   the designated error type for this error
      *
-     * @param string $function_name The function that was called.
-     * @param string $message       A message explaining what has been done incorrectly.
-     * @param int    $error_level   The designated error type for this error.
+     * @since 1.0.0
      */
     Hook::doAction('tp_trigger_error_run', $function_name, $message, $error_level);
 
@@ -1594,7 +1574,7 @@ function tp_is_uuid(mixed $uuid, ?int $version = null): bool
  *
  * This function does not salt the value prior to being hashed, therefore input to this function must originate from
  * a random generator with sufficiently high entropy, preferably greater than 128 bits. This function is used internally
- * in WordPress to hash security keys and application passwords which are generated with high entropy.
+ * in TyPrint to hash security keys and application passwords which are generated with high entropy.
  *
  * Important:
  *
@@ -1752,7 +1732,7 @@ function tp_check_password(
  * Checks whether a password hash needs to be rehashed.
  *
  * Passwords are hashed with argon2id using the default cost. If the default cost or algorithm
- * is changed in PHP or WordPress then a password hashed in a previous version will need to
+ * is changed in PHP or TyPrint then a password hashed in a previous version will need to
  * be rehashed.
  *
  * @param string     $hash    hash of a password to check

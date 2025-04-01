@@ -54,7 +54,8 @@ return (new Config())
         'phpdoc_order' => [
             'order' => ['param',  'return', 'throws', 'since', 'deprecated', 'see'],
         ],
-        'phpdoc_param_order' => true,
+        'phpdoc_param_order' => false, // bug with array param
+        'phpdoc_to_comment' => false,
         'phpdoc_var_annotation_correct_order' => true,
         'phpdoc_add_missing_param_annotation' => [
             'only_untyped' => false,
