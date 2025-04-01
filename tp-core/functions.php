@@ -1511,7 +1511,7 @@ function __return_empty_array(): array
  *
  * @return null null value
  *
- * @since 3.4.0
+ * @since 1.0.0
  */
 function __return_null(): null
 {
@@ -1525,7 +1525,7 @@ function __return_null(): null
  *
  * @return string empty string
  *
- * @since 3.7.0
+ * @since 1.0.0
  * @see __return_null()
  */
 function __return_empty_string(): string
@@ -1605,17 +1605,28 @@ function tp_is_uuid(mixed $uuid, ?int $version = null): bool
  *
  * @return string the hash of the message
  *
- * @throws TypeError|SodiumException thrown by Sodium if the message is not a string
- *
  * @since 1.0.0
  */
 function tp_fast_hash(
     #[SensitiveParameter]
     string $message
 ): string {
-    $hashed = sodium_crypto_generichash($message, 'tp_fast_hash', 30);
+    try {
+        $hashed = sodium_crypto_generichash($message, 'tp_fast_hash', 30);
+    } catch (SodiumException $e) {
+        // If the Sodium extension is not available, fall back to a generic hash function.
+        $hashed = hash('sha256', $message, true);
+    }
 
-    return '$generic$'.sodium_bin2base64($hashed, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
+    // Encode the hash in a URL-safe base64 format without padding.
+    try {
+        $encoded = sodium_bin2base64($hashed, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
+    } catch (SodiumException $e) {
+        // If the Sodium extension is not available, fall back to a generic base64 encoding.
+        $encoded = base64_encode($hashed);
+    }
+
+    return '$generic$'.$encoded;
 }
 
 /**
@@ -1628,8 +1639,6 @@ function tp_fast_hash(
  *
  * @return bool whether the message matches the hashed message
  *
- * @throws TypeError|SodiumException thrown by Sodium if the message is not a string
- *
  * @since 1.0.0
  */
 function tp_verify_fast_hash(
@@ -1638,4 +1647,238 @@ function tp_verify_fast_hash(
     string $hash
 ): bool {
     return hash_equals($hash, tp_fast_hash($message));
+}
+
+/**
+ * Creates a hash of a plain text password.
+ *
+ * @param string $password plain text user password to hash
+ *
+ * @return string the hash string of the password
+ *
+ * @since 1.0.0
+ */
+function tp_hash_password(
+    #[SensitiveParameter]
+    string $password
+): string {
+    if (strlen($password) > 4096) {
+        return '*';
+    }
+
+    /**
+     * Filters the hashing algorithm to use in the password_hash() and password_needs_rehash() functions.
+     *
+     * The default is the value of the `PASSWORD_ARGON2ID` constant which means bcrypt is used.
+     *
+     * **Important:** The only password hashing algorithm that is guaranteed to be available across PHP
+     * installations is bcrypt. If you use any other algorithm you must make sure that it is available on
+     * the server. The `password_algos()` function can be used to check which hashing algorithms are available.
+     *
+     * The hashing options can be controlled via the {@see 'tp_hash_password_options'} filter.
+     *
+     * Other available constants include:
+     *
+     * - `PASSWORD_ARGON2I`
+     * - `PASSWORD_ARGON2ID`
+     * - `PASSWORD_DEFAULT`
+     *
+     * @param string $algorithm The hashing algorithm. Default is the value of the `PASSWORD_ARGON2ID` constant.
+     *
+     * @since 1.0.0
+     */
+    $algorithm = Hook::applyFilter('tp_hash_password_algorithm', PASSWORD_ARGON2ID);
+
+    /**
+     * Filters the options passed to the password_hash() and password_needs_rehash() functions.
+     *
+     * The default hashing algorithm is argon2id, but this can be changed via the {@see 'tp_hash_password_algorithm'}
+     * filter. You must ensure that the options are appropriate for the algorithm in use.
+     *
+     * @param string $algorithm the hashing algorithm in use
+     * @param array  $options   Array of options to pass to the password hashing functions.
+     *                          By default this is an empty array which means the default
+     *                          options will be used.
+     *
+     * @since 1.0.0
+     */
+    $options = Hook::applyFilter('tp_hash_password_options', [], $algorithm);
+
+    return password_hash($password, $algorithm, $options);
+}
+
+/**
+ * Checks a plaintext password against a hashed password.
+ *
+ * @param string     $password plaintext password
+ * @param string     $hash     hash of the password to check against
+ * @param int|string $user_id  Optional. ID of a user associated with the password.
+ *
+ * @return bool false, if the $password does not match the hashed password
+ *
+ * @since 1.0.0
+ */
+function tp_check_password(
+    #[SensitiveParameter]
+    string $password,
+    string $hash,
+    int|string $user_id = ''
+): bool {
+    if (strlen($password) > 4096) {
+        // Passwords longer than 4096 characters are not supported.
+        $check = false;
+    } else {
+        // Check the password using compat support for any non-prefixed hash.
+        $check = password_verify($password, $hash);
+    }
+
+    /*
+     * Filters whether the plaintext password matches the hashed password.
+     *
+     * @since 1.0.0
+     *
+     * @param bool       $check    Whether the passwords match.
+     * @param string     $password The plaintext password.
+     * @param string     $hash     The hashed password.
+     * @param string|int $user_id  Optional ID of a user associated with the password.
+     *                             Can be empty.
+     */
+    return Hook::applyFilter('check_password', $check, $password, $hash, $user_id);
+}
+
+/**
+ * Checks whether a password hash needs to be rehashed.
+ *
+ * Passwords are hashed with argon2id using the default cost. If the default cost or algorithm
+ * is changed in PHP or WordPress then a password hashed in a previous version will need to
+ * be rehashed.
+ *
+ * @param string     $hash    hash of a password to check
+ * @param int|string $user_id Optional. ID of a user associated with the password.
+ *
+ * @return bool whether the hash needs to be rehashed
+ *
+ * @since 1.0.0
+ */
+function tp_password_needs_rehash(string $hash, int|string $user_id = ''): bool
+{
+    global $tp_hasher;
+
+    if (!empty($tp_hasher)) {
+        return false;
+    }
+
+    /** This filter is documented in tp-core/functions.php */
+    $algorithm = Hook::applyFilter('tp_hash_password_algorithm', PASSWORD_ARGON2ID);
+
+    /** This filter is documented in tp-core/functions.php */
+    $options = Hook::applyFilter('tp_hash_password_options', [], $algorithm);
+
+    $needs_rehash = password_needs_rehash($hash, $algorithm, $options);
+
+    /*
+     * Filters whether the password hash needs to be rehashed.
+     *
+     * @since 1.0.0
+     *
+     * @param bool       $needs_rehash Whether the password hash needs to be rehashed.
+     * @param string     $hash         The password hash.
+     * @param string|int $user_id      Optional. ID of a user associated with the password.
+     */
+    return Hook::applyFilter('password_needs_rehash', $needs_rehash, $hash, $user_id);
+}
+
+/**
+ * Generates a random non-negative number.
+ *
+ * @param int|null $min Optional. Lower limit for the generated number.
+ *                      Accepts positive integers or zero. Defaults to 0.
+ * @param int|null $max Optional. Upper limit for the generated number.
+ *                      Accepts positive integers. Defaults to 4294967295.
+ *
+ * @return int a random non-negative number between min and max
+ *
+ * @global string $rnd_value
+ *
+ * @since 1.0.0
+ */
+function tp_rand(?int $min = null, ?int $max = null): int
+{
+    /*
+     * Some misconfigured 32-bit environments (Entropy PHP, for example)
+     * truncate integers larger than PHP_INT_MAX to PHP_INT_MAX rather than overflowing them to floats.
+     */
+    $max_random_number = 3000000000 === 2147483647 ? (float) '4294967295' : 4294967295; // 4294967295 = 0xffffffff
+
+    if (null === $min) {
+        $min = 0;
+    }
+    if (null === $max) {
+        $max = $max_random_number;
+    }
+    $_max = max($min, $max);
+    $_min = min($min, $max);
+    $max = $_max;
+    $min = $_min;
+
+    // Use PHP's CSPRNG, or a compatible method.
+    try {
+        $val = random_int($min, $max);
+
+        return abs($val);
+    } catch (Error|Exception $e) {
+        $rnd_value = md5(uniqid(microtime().mt_rand(), true));
+        // Take the first 8 digits for our value.
+        $value = substr($rnd_value, 0, 8);
+        $value = abs(hexdec($value));
+
+        // Reduce the value to be within the min - max range.
+        $value = $min + ($max - $min + 1) * $value / ($max_random_number + 1);
+
+        return abs($value);
+    }
+}
+
+/**
+ * Generates a random password drawn from the defined set of characters.
+ *
+ * Uses tp_rand() to create passwords with far less predictability
+ * than similar native PHP functions like `rand()` or `mt_rand()`.
+ *
+ * @param int  $length              Optional. The length of password to generate. Default 12.
+ * @param bool $special_chars       Optional. Whether to include standard special characters.
+ *                                  Default true.
+ * @param bool $extra_special_chars Optional. Whether to include other special characters.
+ *                                  Used when generating secret keys and salts. Default false.
+ *
+ * @return string the random password
+ *
+ * @since 1.0.0
+ */
+function tp_generate_password(int $length = 12, bool $special_chars = true, bool $extra_special_chars = false): string
+{
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    if ($special_chars) {
+        $chars .= '!@#$%^&*()';
+    }
+    if ($extra_special_chars) {
+        $chars .= '-_ []{}<>~`+=,.;:/?|';
+    }
+
+    $password = '';
+    for ($i = 0; $i < $length; ++$i) {
+        $password .= substr($chars, tp_rand(0, strlen($chars) - 1), 1);
+    }
+
+    /*
+     * Filters the randomly-generated password.
+     *
+     * @since 1.0.0
+     *
+     * @param string $password            The generated password.
+     * @param int    $length              The length of password to generate.
+     * @param bool   $special_chars       Whether to include standard special characters.
+     * @param bool   $extra_special_chars Whether to include other special characters.
+     */
+    return Hook::applyFilter('random_password', $password, $length, $special_chars, $extra_special_chars);
 }

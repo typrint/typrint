@@ -14,61 +14,6 @@ declare(strict_types=1);
 use TP\Facades\Hook;
 
 /**
- * Converts a number of special characters into their HTML entities.
- *
- * Specifically deals with: `&`, `<`, `>`, `"`, and `'`.
- *
- * `$quote_style` can be set to ENT_COMPAT to encode `"` to
- * `&quot;`, or ENT_QUOTES to do both. Default is ENT_NOQUOTES where no quotes are encoded.
- *
- * @param string       $text          the text which is to be encoded
- * @param int|string   $quote_style   Optional. Converts double quotes if set to ENT_COMPAT,
- *                                    both single and double if set to ENT_QUOTES or none if set to ENT_NOQUOTES.
- *                                    Converts single and double quotes, as well as converting HTML
- *                                    named entities (that are not also XML named entities) to their
- *                                    code points if set to ENT_XML1. Also compatible with old values;
- *                                    converting single quotes if set to 'single',
- *                                    double if set to 'double' or both if otherwise set.
- *                                    Default is ENT_NOQUOTES.
- * @param false|string $charset       Optional. The character encoding of the string. Default false.
- * @param bool         $double_encode Optional. Whether to encode existing HTML entities. Default false.
- *
- * @return string the encoded text with HTML entities
- *
- * @since 1.0.0
- */
-function _tp_specialchars(string $text, int|string $quote_style = ENT_NOQUOTES, false|string $charset = false, bool $double_encode = false): string
-{
-    if ('' === $text) {
-        return '';
-    }
-
-    // Don't bother if there are no specialchars - saves some processing.
-    if (!preg_match('/[&<>"\']/', $text)) {
-        return $text;
-    }
-
-    // Account for the previous behavior of the function when the $quote_style is not an accepted value.
-    if (empty($quote_style)) {
-        $quote_style = ENT_NOQUOTES;
-    } elseif (ENT_XML1 === $quote_style) {
-        $quote_style = ENT_QUOTES | ENT_XML1;
-    } elseif (!in_array($quote_style, [ENT_NOQUOTES, ENT_COMPAT, ENT_QUOTES, 'single', 'double'], true)) {
-        $quote_style = ENT_QUOTES;
-    }
-
-    if ('double' === $quote_style) {
-        $quote_style = ENT_COMPAT;
-    } elseif ('single' === $quote_style) {
-        $quote_style = ENT_NOQUOTES;
-    }
-
-    $text = htmlspecialchars($text, $quote_style, 'UTF-8', $double_encode);
-
-    return $text;
-}
-
-/**
  * Checks to see if a string is utf8 encoded.
  *
  * NOTE: This function checks for 5-Byte sequences, UTF8
@@ -80,7 +25,7 @@ function _tp_specialchars(string $text, int|string $quote_style = ENT_NOQUOTES, 
  *
  * @author bmorel at ssi dot fr (modified)
  *
- * @since 1.2.1
+ * @since 1.0.0
  */
 function seems_utf8(string $str): bool
 {
@@ -123,22 +68,12 @@ function seems_utf8(string $str): bool
  *
  * @return string the checked text
  *
- * @since 2.8.0
+ * @since 1.0.0
  */
 function tp_check_invalid_utf8(string $text, bool $strip = false): string
 {
     if ('' === $text) {
         return '';
-    }
-
-    // Check for support for utf8 in the installed PCRE library once and store the result in a static.
-    static $utf8_pcre = null;
-    if (!isset($utf8_pcre)) {
-        $utf8_pcre = @preg_match('/^./u', 'a');
-    }
-    // We can't demand utf8 in the PCRE installation, so just return the string in those cases.
-    if (!$utf8_pcre) {
-        return $text;
     }
 
     if (1 === @preg_match('/^./us', $text)) {
@@ -162,8 +97,7 @@ function tp_check_invalid_utf8(string $text, bool $strip = false): string
  *
  * @return string string with Unicode encoded for URI
  *
- * @since 1.5.0
- * @since 5.8.3 Added the `encode_ascii_characters` parameter.
+ * @since 1.0.0
  */
 function utf8_uri_encode(string $utf8_string, int $length = 0, bool $encode_ascii_characters = false): string
 {
@@ -604,13 +538,7 @@ function utf8_uri_encode(string $utf8_string, int $length = 0, bool $encode_asci
  *
  * @return string filtered string with replaced "nice" characters
  *
- * @since 1.2.1
- * @since 4.6.0 Added locale support for `de_CH`, `de_CH_informal`, and `ca`.
- * @since 4.7.0 Added locale support for `sr_RS`.
- * @since 4.8.0 Added locale support for `bs_BA`.
- * @since 5.7.0 Added locale support for `de_AT`.
- * @since 6.0.0 Added the `$locale` parameter.
- * @since 6.1.0 Added Unicode NFC encoding normalization support.
+ * @since 1.0.0
  */
 function remove_accents(string $text, string $locale = ''): string
 {
@@ -1021,7 +949,7 @@ function remove_accents(string $text, string $locale = ''): string
  *
  * @return string sanitized key
  *
- * @since 3.0.0
+ * @since 1.0.0
  */
 function sanitize_key(string $key): string
 {
@@ -1031,7 +959,7 @@ function sanitize_key(string $key): string
     /*
      * Filters a sanitized key string.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      *
      * @param string $sanitized_key Sanitized key.
      * @param string $key           The key prior to sanitization.
@@ -1052,13 +980,13 @@ function sanitize_key(string $key): string
  * @param string $fallback_title Optional. A title to use if $title is empty. Default empty.
  * @param string $context        Optional. The operation for which the string is sanitized.
  *                               When set to 'save', the string runs through remove_accents().
- *                               Default 'save'.
+ *                               Default 'query'.
  *
  * @return string the sanitized string
  *
  * @since 1.0.0
  */
-function sanitize_title(string $title, string $fallback_title = '', string $context = 'save'): string
+function sanitize_title(string $title, string $fallback_title = '', string $context = 'query'): string
 {
     $raw_title = $title;
 
@@ -1073,7 +1001,7 @@ function sanitize_title(string $title, string $fallback_title = '', string $cont
      * @param string $raw_title the title prior to sanitization
      * @param string $context   the context for which the title is being sanitized
      *
-     * @since 1.2.0
+     * @since 1.0.0
      */
     $title = Hook::applyFilter('sanitize_title', $title, $raw_title, $context);
 
@@ -1082,22 +1010,6 @@ function sanitize_title(string $title, string $fallback_title = '', string $cont
     }
 
     return $title;
-}
-
-/**
- * Sanitizes a title with the 'query' context.
- *
- * Used for querying the database for a value from URL.
- *
- * @param string $title the string to be sanitized
- *
- * @return string the sanitized string
- *
- * @since 3.1.0
- */
-function sanitize_title_for_query(string $title): string
-{
-    return sanitize_title($title, '', 'query');
 }
 
 /**
@@ -1113,7 +1025,7 @@ function sanitize_title_for_query(string $title): string
  *
  * @return string the sanitized title
  *
- * @since 1.2.0
+ * @since 1.0.0
  */
 function sanitize_title_with_dashes(string $title, string $context = 'display'): string
 {
@@ -1233,29 +1145,6 @@ function sanitize_title_with_dashes(string $title, string $context = 'display'):
 }
 
 /**
- * Ensures a string is a valid SQL 'order by' clause.
- *
- * Accepts one or more columns, with or without a sort order (ASC / DESC).
- * e.g. 'column_1', 'column_1, column_2', 'column_1 ASC, column_2 DESC' etc.
- *
- * Also accepts 'RAND()'.
- *
- * @param string $orderby order by clause to be validated
- *
- * @return string|false returns $orderby if valid, false otherwise
- *
- * @since 2.5.1
- */
-function sanitize_sql_orderby(string $orderby): false|string
-{
-    if (preg_match('/^\s*(([a-z0-9_]+|`[a-z0-9_]+`)(\s+(ASC|DESC))?\s*(,\s*(?=[a-z0-9_`])|$))+$/i', $orderby) || preg_match('/^\s*RAND\(\s*\)\s*$/i', $orderby)) {
-        return $orderby;
-    }
-
-    return false;
-}
-
-/**
  * Sanitizes an HTML classname to ensure it only contains valid characters.
  *
  * Strips the string down to A-Z,a-z,0-9,_,-. If this results in an empty
@@ -1269,7 +1158,7 @@ function sanitize_sql_orderby(string $orderby): false|string
  *
  * @todo Expand to support the full range of CDATA that a class attribute can contain.
  *
- * @since 2.8.0
+ * @since 1.0.0
  */
 function sanitize_html_class(string $classname, string $fallback = ''): string
 {
@@ -1286,7 +1175,7 @@ function sanitize_html_class(string $classname, string $fallback = ''): string
     /*
      * Filters a sanitized HTML class string.
      *
-     * @since 2.8.0
+     * @since 1.0.0
      *
      * @param string $sanitized The sanitized HTML class.
      * @param string $classname HTML class before sanitization.
@@ -1302,7 +1191,7 @@ function sanitize_html_class(string $classname, string $fallback = ''): string
  *
  * @return string the sanitized value
  *
- * @since 6.2.1
+ * @since 1.0.0
  */
 function sanitize_locale_name(string $locale_name): string
 {
@@ -1312,30 +1201,12 @@ function sanitize_locale_name(string $locale_name): string
     /*
      * Filters a sanitized locale name string.
      *
-     * @since 6.2.1
+     * @since 1.0.0
      *
      * @param string $sanitized   The sanitized locale name.
      * @param string $locale_name The locale name before sanitization.
      */
     return Hook::applyFilter('sanitize_locale_name', $sanitized, $locale_name);
-}
-
-/**
- * Converts lone & characters into `&#038;` (a.k.a. `&amp;`).
- *
- * @param string $content string of characters to be converted
- *
- * @return string converted string
- *
- * @since 0.71
- */
-function convert_chars(string $content): string
-{
-    if (str_contains($content, '&')) {
-        $content = preg_replace('/&([^#])(?![a-z1-4]{1,8};)/i', '&#038;$1', $content);
-    }
-
-    return $content;
 }
 
 /**
@@ -1345,7 +1216,7 @@ function convert_chars(string $content): string
  *
  * @return string converted string
  *
- * @since 4.3.0
+ * @since 1.0.0
  */
 function convert_invalid_entities(string $content): string
 {
@@ -1398,7 +1269,7 @@ function convert_invalid_entities(string $content): string
  *
  * @return string the normalized string
  *
- *@since 2.7.0
+ * @since 1.0.0
  */
 function normalize_whitespace(string $str): string
 {
@@ -1421,7 +1292,7 @@ function normalize_whitespace(string $str): string
  *
  * @return string the processed string
  *
- * @since 2.9.0
+ * @since 1.0.0
  */
 function tp_strip_all_tags(string $text, bool $remove_breaks = false): string
 {
@@ -1444,7 +1315,7 @@ function tp_strip_all_tags(string $text, bool $remove_breaks = false): string
  *
  * @return string|false valid email address on success, false on failure
  *
- * @since 0.71
+ * @since 1.0.0
  */
 function is_email(string $email): false|string
 {
@@ -1457,7 +1328,7 @@ function is_email(string $email): false|string
          * 'email_no_at', 'local_invalid_chars', 'domain_period_sequence', 'domain_period_limits',
          * 'domain_no_periods', 'sub_hyphen_limits', 'sub_invalid_chars', or no specific context.
          *
-         * @since 2.8.0
+         * @since 1.0.0
          *
          * @param string|false $is_email The email address if successfully passed the is_email() checks, false otherwise.
          * @param string       $email    The email address being checked.
@@ -1535,7 +1406,7 @@ function is_email(string $email): false|string
  *
  * @return string filtered email address
  *
- * @since 1.5.0
+ * @since 1.0.0
  */
 function sanitize_email(string $email): string
 {
@@ -1548,7 +1419,7 @@ function sanitize_email(string $email): string
          * 'email_no_at', 'local_invalid_chars', 'domain_period_sequence', 'domain_period_limits',
          * 'domain_no_periods', 'domain_no_valid_subs', or no context.
          *
-         * @since 2.8.0
+         * @since 1.0.0
          *
          * @param string $sanitized_email The sanitized email address.
          * @param string $email           The email address, as provided to sanitize_email().
@@ -1652,7 +1523,7 @@ function sanitize_email(string $email): string
  *                An empty string is returned if `$url` specifies a protocol other than
  *                those in `$protocols`, or if `$url` contains an empty string.
  *
- * @since 2.8.0
+ * @since 1.0.0
  */
 function esc_url(string $url, ?array $protocols = null, string $_context = 'display'): string
 {
@@ -1677,13 +1548,13 @@ function esc_url(string $url, ?array $protocols = null, string $_context = 'disp
     $url = str_replace(';//', '://', $url);
     /*
      * If the URL doesn't appear to contain a scheme, we presume
-     * it needs http:// prepended (unless it's a relative link
+     * it needs https:// prepended (unless it's a relative link
      * starting with /, # or ?, or a PHP file).
      */
     if (!str_contains($url, ':') && !in_array($url[0], ['/', '#', '?'], true)
         && !preg_match('/^[a-z0-9-]+?\.php/i', $url)
     ) {
-        $url = 'http://'.$url;
+        $url = 'https://'.$url;
     }
 
     // Replace ampersands and single quotes only when displaying.
@@ -1753,9 +1624,7 @@ function esc_url(string $url, ?array $protocols = null, string $_context = 'disp
  *
  * @return string the cleaned URL after esc_url() is run with the 'db' context
  *
- * @since 2.3.1
- * @since 2.8.0 Deprecated in favor of esc_url_raw().
- * @since 5.9.0 Restored (un-deprecated).
+ * @since 1.0.0
  * @see esc_url()
  */
 function sanitize_url(string $url, ?array $protocols = null): string
@@ -1774,7 +1643,7 @@ function sanitize_url(string $url, ?array $protocols = null): string
  *
  * @return string escaped text
  *
- * @since 2.8.0
+ * @since 1.0.0
  */
 function esc_js(string $text): string
 {
@@ -1790,7 +1659,7 @@ function esc_js(string $text): string
      * Text passed to esc_js() is stripped of invalid or special characters,
      * and properly slashed for output.
      *
-     * @since 2.0.6
+     * @since 1.0.0
      *
      * @param string $safe_text The text after it has been escaped.
      * @param string $text      The text prior to being escaped.
@@ -1801,7 +1670,7 @@ function esc_js(string $text): string
 /**
  * Escaping for HTML blocks.
  *
- * @since 2.8.0
+ * @since 1.0.0
  */
 function esc_html(string $text): string
 {
@@ -1814,7 +1683,7 @@ function esc_html(string $text): string
      * Text passed to esc_html() is stripped of invalid or special characters
      * before output.
      *
-     * @since 2.8.0
+     * @since 1.0.0
      *
      * @param string $safe_text The text after it has been escaped.
      * @param string $text      The text prior to being escaped.
@@ -1825,7 +1694,7 @@ function esc_html(string $text): string
 /**
  * Escaping for HTML attributes.
  *
- * @since 2.8.0
+ * @since 1.0.0
  */
 function esc_attr(string $text): string
 {
@@ -1838,7 +1707,7 @@ function esc_attr(string $text): string
      * Text passed to esc_attr() is stripped of invalid or special characters
      * before output.
      *
-     * @since 2.0.6
+     * @since 1.0.0
      *
      * @param string $safe_text The text after it has been escaped.
      * @param string $text      The text prior to being escaped.
@@ -1849,7 +1718,7 @@ function esc_attr(string $text): string
 /**
  * Escaping for textarea values.
  *
- * @since 3.1.0
+ * @since 1.0.0
  */
 function esc_textarea(string $text): string
 {
@@ -1858,7 +1727,7 @@ function esc_textarea(string $text): string
     /*
      * Filters a string cleaned and escaped for output in a textarea element.
      *
-     * @since 3.1.0
+     * @since 1.0.0
      *
      * @param string $safe_text The text after it has been escaped.
      * @param string $text      The text prior to being escaped.
@@ -1873,7 +1742,7 @@ function esc_textarea(string $text): string
  *
  * @return string escaped text
  *
- * @since 5.5.0
+ * @since 1.0.0
  */
 function esc_xml(string $text): string
 {
@@ -1917,7 +1786,7 @@ function esc_xml(string $text): string
      * before output. HTML named character references are converted to their
      * equivalent code points.
      *
-     * @since 5.5.0
+     * @since 1.0.0
      *
      * @param string $safe_text The text after it has been escaped.
      * @param string $text      The text prior to being escaped.
@@ -1928,8 +1797,7 @@ function esc_xml(string $text): string
 /**
  * Escapes an HTML tag name.
  *
- * @since 2.5.0
- * @since 6.5.5 Allow hyphens in tag names (i.e. custom elements).
+ * @since 1.0.0
  */
 function escape_tag(string $tag_name): string
 {
@@ -1938,7 +1806,7 @@ function escape_tag(string $tag_name): string
     /*
      * Filters a string cleaned and escaped for output as an HTML tag.
      *
-     * @since 2.8.0
+     * @since 1.0.0
      *
      * @param string $safe_tag The tag name after it has been escaped.
      * @param string $tag_name The text before it was escaped.
@@ -1959,7 +1827,7 @@ function escape_tag(string $tag_name): string
  *
  * @return string sanitized string
  *
- * @since 2.9.0
+ * @since 1.0.0
  * @see sanitize_textarea_field()
  * @see tp_check_invalid_utf8()
  * @see tp_strip_all_tags()
@@ -1971,7 +1839,7 @@ function sanitize_text_field(string $str): string
     /*
      * Filters a sanitized text field string.
      *
-     * @since 2.9.0
+     * @since 1.0.0
      *
      * @param string $filtered The sanitized string.
      * @param string $str      The string prior to being sanitized.
@@ -1990,7 +1858,7 @@ function sanitize_text_field(string $str): string
  *
  * @return string sanitized string
  *
- * @since 4.7.0
+ * @since 1.0.0
  * @see sanitize_text_field()
  */
 function sanitize_textarea_field(string $str): string
@@ -2000,7 +1868,7 @@ function sanitize_textarea_field(string $str): string
     /*
      * Filters a sanitized textarea field string.
      *
-     * @since 4.7.0
+     * @since 1.0.0
      *
      * @param string $filtered The sanitized string.
      * @param string $str      The string prior to being sanitized.
@@ -2016,14 +1884,13 @@ function sanitize_textarea_field(string $str): string
  *
  * @return string sanitized string
  *
- * @since 4.7.0
+ * @since 1.0.0
  */
 function _sanitize_text_fields(string $str, bool $keep_newlines = false): string
 {
     $filtered = tp_check_invalid_utf8($str);
 
     if (str_contains($filtered, '<')) {
-        $filtered = tp_pre_kses_less_than($filtered);
         // This will strip extra whitespace for us.
         $filtered = tp_strip_all_tags($filtered, false);
 
@@ -2061,7 +1928,7 @@ function _sanitize_text_fields(string $str, bool $keep_newlines = false): string
  *
  * @return string sanitized mime type
  *
- * @since 3.1.3
+ * @since 1.0.0
  */
 function sanitize_mime_type(string $mime_type): string
 {
@@ -2070,7 +1937,7 @@ function sanitize_mime_type(string $mime_type): string
     /*
      * Filters a mime type following sanitization.
      *
-     * @since 3.1.3
+     * @since 1.0.0
      *
      * @param string $sani_mime_type The sanitized mime type.
      * @param string $mime_type      The mime type prior to sanitization.
@@ -2085,7 +1952,7 @@ function sanitize_mime_type(string $mime_type): string
  *
  * @return string URLs starting with the http or https protocol, separated by a carriage return
  *
- * @since 3.4.0
+ * @since 1.0.0
  */
 function sanitize_trackback_urls(string $to_ping): string
 {
@@ -2104,7 +1971,7 @@ function sanitize_trackback_urls(string $to_ping): string
      * The string returned here consists of a space or carriage return-delimited list
      * of trackback URLs.
      *
-     * @since 3.4.0
+     * @since 1.0.0
      *
      * @param string $urls_to_ping Sanitized space or carriage return separated URLs.
      * @param string $to_ping      Space or carriage return separated URLs before sanitization.
@@ -2120,7 +1987,7 @@ function sanitize_trackback_urls(string $to_ping): string
  *
  * @return string|void
  *
- * @since 3.4.0
+ * @since 1.0.0
  */
 function sanitize_hex_color(string $color)
 {
@@ -2143,7 +2010,7 @@ function sanitize_hex_color(string $color)
  *
  * Returns either '', a 3 or 6 digit hex color (without a #), or null.
  *
- * @since 3.4.0
+ * @since 1.0.0
  */
 function sanitize_hex_color_no_hash(string $color): ?string
 {
@@ -2162,7 +2029,7 @@ function sanitize_hex_color_no_hash(string $color): ?string
  *
  * This method should only be necessary if using sanitize_hex_color_no_hash().
  *
- * @since 3.4.0
+ * @since 1.0.0
  */
 function maybe_hash_hex_color(string $color): string
 {
@@ -2184,8 +2051,7 @@ function maybe_hash_hex_color(string $color): string
  *
  * @return string|array slashed `$value`, in the same type as supplied
  *
- * @since 3.6.0
- * @since 5.5.0 Non-string values are left untouched.
+ * @since 1.0.0
  */
 function tp_slash(array|string $value): array|string
 {
@@ -2210,11 +2076,66 @@ function tp_slash(array|string $value): array|string
  *
  * @return string|array unslashed `$value`, in the same type as supplied
  *
- * @since 3.6.0
+ * @since 1.0.0
  */
 function tp_unslash(array|string $value): array|string
 {
     return stripslashes_deep($value);
+}
+
+/**
+ * Converts a number of special characters into their HTML entities.
+ *
+ * Specifically deals with: `&`, `<`, `>`, `"`, and `'`.
+ *
+ * `$quote_style` can be set to ENT_COMPAT to encode `"` to
+ * `&quot;`, or ENT_QUOTES to do both. Default is ENT_NOQUOTES where no quotes are encoded.
+ *
+ * @param string       $text          the text which is to be encoded
+ * @param int|string   $quote_style   Optional. Converts double quotes if set to ENT_COMPAT,
+ *                                    both single and double if set to ENT_QUOTES or none if set to ENT_NOQUOTES.
+ *                                    Converts single and double quotes, as well as converting HTML
+ *                                    named entities (that are not also XML named entities) to their
+ *                                    code points if set to ENT_XML1. Also compatible with old values;
+ *                                    converting single quotes if set to 'single',
+ *                                    double if set to 'double' or both if otherwise set.
+ *                                    Default is ENT_NOQUOTES.
+ * @param false|string $charset       Optional. The character encoding of the string. Default false.
+ * @param bool         $double_encode Optional. Whether to encode existing HTML entities. Default false.
+ *
+ * @return string the encoded text with HTML entities
+ *
+ * @since 1.0.0
+ */
+function _tp_specialchars(string $text, int|string $quote_style = ENT_NOQUOTES, false|string $charset = false, bool $double_encode = false): string
+{
+    if ('' === $text) {
+        return '';
+    }
+
+    // Don't bother if there are no specialchars - saves some processing.
+    if (!preg_match('/[&<>"\']/', $text)) {
+        return $text;
+    }
+
+    // Account for the previous behavior of the function when the $quote_style is not an accepted value.
+    if (empty($quote_style)) {
+        $quote_style = ENT_NOQUOTES;
+    } elseif (ENT_XML1 === $quote_style) {
+        $quote_style = ENT_QUOTES | ENT_XML1;
+    } elseif (!in_array($quote_style, [ENT_NOQUOTES, ENT_COMPAT, ENT_QUOTES, 'single', 'double'], true)) {
+        $quote_style = ENT_QUOTES;
+    }
+
+    if ('double' === $quote_style) {
+        $quote_style = ENT_COMPAT;
+    } elseif ('single' === $quote_style) {
+        $quote_style = ENT_NOQUOTES;
+    }
+
+    $text = htmlspecialchars($text, $quote_style, 'UTF-8', $double_encode);
+
+    return $text;
 }
 
 /**
@@ -2223,7 +2144,7 @@ function tp_unslash(array|string $value): array|string
  * @param string $input_string the string to be parsed
  * @param array  $result       variables will be stored in this array
  *
- * @since 2.2.1
+ * @since 1.0.0
  */
 function tp_parse_str(string $input_string, array &$result): void
 {
@@ -2234,7 +2155,7 @@ function tp_parse_str(string $input_string, array &$result): void
      *
      * @param array $result the array populated with variables
      *
-     * @since 2.2.1
+     * @since 1.0.0
      */
     $result = Hook::applyFilter('tp_parse_str', $result);
 }
@@ -2246,7 +2167,7 @@ function tp_parse_str(string $input_string, array &$result): void
  *
  * @return string|false the found URL
  *
- * @since 3.6.0
+ * @since 1.0.0
  */
 function get_url_in_content(string $content): false|string
 {
@@ -2262,84 +2183,14 @@ function get_url_in_content(string $content): false|string
 }
 
 /**
- * Returns the regexp for common whitespace characters.
- *
- * By default, spaces include new lines, tabs, nbsp entities, and the UTF-8 nbsp.
- * This is designed to replace the PCRE \s sequence. In ticket #22692, that
- * sequence was found to be unreliable due to random inclusion of the A0 byte.
- *
- * @return string the spaces regexp
- *
- * @since 4.0.0
- */
-function tp_spaces_regexp(): string
-{
-    static $spaces = '';
-
-    if (empty($spaces)) {
-        /**
-         * Filters the regexp for common whitespace characters.
-         *
-         * This string is substituted for the \s sequence as needed in regular
-         * expressions. For websites not written in English, different characters
-         * may represent whitespace. For websites not encoded in UTF-8, the 0xC2 0xA0
-         * sequence may not be in use.
-         *
-         * @param string $spaces regexp pattern for matching common whitespace characters
-         *
-         * @since 4.0.0
-         */
-        $spaces = Hook::applyFilter('tp_spaces_regexp', '[\r\n\t ]|\xC2\xA0|&nbsp;');
-    }
-
-    return $spaces;
-}
-
-/**
- * Converts lone less than signs.
- *
- * KSES already converts lone greater than signs.
- *
- * @param string $content text to be converted
- *
- * @return string converted text
- *
- * @since 1.0.0
- */
-function tp_pre_kses_less_than(string $content): string
-{
-    return preg_replace_callback('%<[^>]*?((?=<)|>|$)%', 'tp_pre_kses_less_than_callback', $content);
-}
-
-/**
- * Callback function used by preg_replace.
- *
- * @param string[] $matches populated by matches to preg_replace
- *
- * @return string the text returned after esc_html if needed
- *
- * @since 1.0.0
- */
-function tp_pre_kses_less_than_callback(array $matches): string
-{
-    if (!str_contains($matches[0], '>')) {
-        return esc_html($matches[0]);
-    }
-
-    return $matches[0];
-}
-
-/**
- * WordPress' implementation of PHP sprintf() with filters.
+ * TyPrint's implementation of PHP sprintf() with filters.
  *
  * @param string $pattern the string which formatted args are inserted
  * @param mixed  ...$args Arguments to be formatted into the $pattern string.
  *
  * @return string the formatted string
  *
- * @since 2.5.0
- * @since 5.3.0 Formalized the existing and already documented `...$args` parameter
- *              by adding it to the function signature.
+ * @since 1.0.0
  * @see https://www.php.net/sprintf
  */
 function tp_sprintf(string $pattern, ...$args): string
@@ -2390,7 +2241,7 @@ function tp_sprintf(string $pattern, ...$args): string
              * @param string $fragment a fragment from the pattern
              * @param string $arg      the argument
              *
-             * @since 2.5.0
+             * @since 1.0.0
              */
             $_fragment = Hook::applyFilter('tp_sprintf', $fragment, $arg);
 
@@ -2421,7 +2272,7 @@ function tp_sprintf(string $pattern, ...$args): string
  *
  * @return string localized list items and rest of the content
  *
- * @since 2.5.0
+ * @since 1.0.0
  */
 function tp_sprintf_l(string $pattern, array $args): string
 {
@@ -2444,7 +2295,7 @@ function tp_sprintf_l(string $pattern, array $args): string
      *
      * @param array $delimiters an array of translated delimiters
      *
-     * @since 2.5.0
+     * @since 1.0.0
      */
     $l = Hook::applyFilter(
         'tp_sprintf_l',
@@ -2491,7 +2342,7 @@ function tp_sprintf_l(string $pattern, array $args): string
  *
  * @return string the excerpt
  *
- * @since 2.5.0
+ * @since 1.0.0
  */
 function tp_html_excerpt(string $str, int $count, ?string $more = null): string
 {
@@ -2522,7 +2373,7 @@ function tp_html_excerpt(string $str, int $count, ?string $more = null): string
  *
  * @return mixed the value with the callback applied to all non-arrays and non-objects inside it
  *
- * @since 4.4.0
+ * @since 1.0.0
  */
 function map_deep(mixed $value, callable $callback): mixed
 {
@@ -2549,7 +2400,7 @@ function map_deep(mixed $value, callable $callback): mixed
  *
  * @return mixed stripped value
  *
- * @since 2.0.0
+ * @since 1.0.0
  */
 function stripslashes_deep(mixed $value): mixed
 {
@@ -2563,7 +2414,7 @@ function stripslashes_deep(mixed $value): mixed
  *
  * @return mixed the stripped value
  *
- * @since 4.4.0
+ * @since 1.0.0
  */
 function stripslashes_from_strings_only(mixed $value): mixed
 {
@@ -2577,7 +2428,7 @@ function stripslashes_from_strings_only(mixed $value): mixed
  *
  * @return mixed the encoded value
  *
- * @since 2.2.0
+ * @since 1.0.0
  */
 function urlencode_deep(mixed $value): mixed
 {
@@ -2591,7 +2442,7 @@ function urlencode_deep(mixed $value): mixed
  *
  * @return mixed the encoded value
  *
- * @since 3.4.0
+ * @since 1.0.0
  */
 function rawurlencode_deep(mixed $value): mixed
 {
@@ -2605,7 +2456,7 @@ function rawurlencode_deep(mixed $value): mixed
  *
  * @return mixed the decoded value
  *
- * @since 4.4.0
+ * @since 1.0.0
  */
 function urldecode_deep(mixed $value): mixed
 {
@@ -2625,7 +2476,7 @@ function urldecode_deep(mixed $value): mixed
  *
  * @return string the string with the replaced values
  *
- * @since 2.8.1
+ * @since 1.0.0
  */
 function _deep_replace(array|string $search, string $subject): string
 {
