@@ -1,0 +1,366 @@
+// TyPrint 管理后台主题 - 表格
+
+@use "variables" as vars;
+@use "sass:color";
+
+// 覆盖 Bootstrap 的表格样式
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  vertical-align: middle;
+  border-collapse: collapse;
+  
+  // 表头
+  thead {
+    th {
+      font-weight: 500;
+      color: vars.$tp-gray-80;
+      background-color: vars.$tp-gray-0;
+      border-bottom: 1px solid vars.$tp-border-color;
+      padding: 0.5rem;
+      white-space: nowrap;
+      
+      a {
+        text-decoration: none;
+        color: vars.$tp-gray-80;
+        display: inline-flex;
+        align-items: center;
+        
+        &:hover {
+          color: vars.$tp-blue;
+        }
+        
+        .sort-icon {
+          margin-left: 0.3rem;
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+  
+  // 表体
+  tbody {
+    tr {
+      transition: background-color 0.15s ease-in-out;
+      
+      &:hover {
+        background-color: color.adjust(vars.$tp-blue-lighter, $alpha: -0.95);
+      }
+      
+      // 选中行
+      &.selected {
+        background-color: color.adjust(vars.$tp-blue-lighter, $alpha: -0.9);
+      }
+      
+      // 交替行
+      &:nth-of-type(odd) {
+        background-color: color.adjust(vars.$tp-gray-5, $alpha: -0.5);
+        
+        &:hover {
+          background-color: color.adjust(vars.$tp-blue-lighter, $alpha: -0.95);
+        }
+      }
+      
+      td {
+        padding: 0.5rem;
+        border-bottom: 1px solid vars.$tp-border-color;
+        color: vars.$tp-gray-90;
+        
+        // 标题单元格
+        &.column-title {
+          font-weight: 500;
+          
+          a {
+            text-decoration: none;
+            color: vars.$tp-blue;
+            
+            &:hover {
+              color: vars.$tp-blue-darker;
+              text-decoration: underline;
+            }
+          }
+        }
+        
+        // 状态单元格
+        &.column-status {
+          .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.3rem;
+            
+            &.status-published {
+              background-color: vars.$tp-green;
+            }
+            
+            &.status-draft {
+              background-color: vars.$tp-gray-30;
+            }
+            
+            &.status-pending {
+              background-color: vars.$tp-yellow;
+            }
+            
+            &.status-private {
+              background-color: vars.$tp-blue;
+            }
+            
+            &.status-trash {
+              background-color: vars.$tp-red;
+            }
+          }
+        }
+        
+        // 日期单元格
+        &.column-date {
+          white-space: nowrap;
+          color: vars.$tp-gray-50;
+          font-size: 0.9rem;
+        }
+        
+        // 作者单元格
+        &.column-author {
+          .author-name {
+            display: inline-flex;
+            align-items: center;
+            
+            .author-avatar {
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              margin-right: 0.5rem;
+              overflow: hidden;
+              
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+          }
+        }
+        
+        // 操作单元格
+        &.column-actions {
+          white-space: nowrap;
+          text-align: right;
+          
+          .row-actions {
+            display: none;
+            font-size: 0.85rem;
+            color: vars.$tp-gray-50;
+            
+            a {
+              text-decoration: none;
+              color: vars.$tp-blue;
+              margin-right: 0.5rem;
+              
+              &:hover {
+                color: vars.$tp-blue-darker;
+                text-decoration: underline;
+              }
+              
+              &.delete {
+                color: vars.$tp-red;
+                
+                &:hover {
+                  color: color.adjust(vars.$tp-red, $blackness: 10%);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      &:hover {
+        .column-actions {
+          .row-actions {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+  
+  // 表尾
+  tfoot {
+    th {
+      font-weight: 500;
+      color: vars.$tp-gray-80;
+      background-color: vars.$tp-gray-0;
+      border-top: 1px solid vars.$tp-border-color;
+      padding: 0.5rem;
+    }
+  }
+  
+  // 多选框列
+  .check-column {
+    width: 2rem;
+    padding: 0.5rem;
+    text-align: center;
+    
+    input[type="checkbox"] {
+      margin: 0;
+    }
+  }
+  
+  // 响应式表格
+  @media (max-width: 767.98px) {
+    thead {
+      display: none;
+    }
+    
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid vars.$tp-border-color;
+        border-radius: vars.$border-radius;
+        
+        td {
+          display: block;
+          text-align: right;
+          padding: 0.5rem 1rem;
+          border-bottom: 1px solid vars.$tp-border-color;
+          
+          &:last-child {
+            border-bottom: 0;
+          }
+          
+          &::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: 500;
+            color: vars.$tp-gray-80;
+          }
+          
+          &.check-column {
+            text-align: center;
+            
+            &::before {
+              content: none;
+            }
+          }
+          
+          .row-actions {
+            display: block;
+            margin-top: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 表格分页
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  
+  .pagination-info {
+    color: vars.$tp-gray-60;
+    font-size: 0.9rem;
+  }
+  
+  .pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    .page-item {
+      margin: 0 0.1rem;
+      
+      .page-link {
+        display: block;
+        padding: 0.25rem 0.5rem;
+        color: vars.$tp-blue;
+        background-color: #fff;
+        border: 1px solid vars.$tp-border-color;
+        border-radius: vars.$border-radius;
+        text-decoration: none;
+        
+        &:hover {
+          background-color: vars.$tp-gray-5;
+          color: vars.$tp-blue-darker;
+        }
+      }
+      
+      &.active {
+        .page-link {
+          background-color: vars.$tp-blue;
+          border-color: vars.$tp-blue;
+          color: #fff;
+          
+          &:hover {
+            background-color: vars.$tp-blue-darker;
+            border-color: vars.$tp-blue-darker;
+          }
+        }
+      }
+      
+      &.disabled {
+        .page-link {
+          color: vars.$tp-gray-30;
+          pointer-events: none;
+          background-color: vars.$tp-gray-5;
+        }
+      }
+    }
+  }
+}
+
+// 表格过滤和搜索
+.table-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  
+  .filter-item {
+    .form-select, .form-control {
+      font-size: 0.9rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+  
+  .filter-search {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    
+    .form-control {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    
+    .btn {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+}
+
+// 表格批量操作
+.table-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: vars.$tp-gray-0;
+  border: 1px solid vars.$tp-border-color;
+  border-radius: vars.$border-radius;
+  
+  .bulk-action-select {
+    min-width: 200px;
+    
+    .form-select {
+      font-size: 0.9rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+} 

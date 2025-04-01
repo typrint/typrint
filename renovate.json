@@ -27,5 +27,7 @@
       "automerge": true
     }
   ],
-  "ignoreDeps": []
+  "ignoreDeps": [
+    "sass"
+  ]
 }

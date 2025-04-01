@@ -1,0 +1,188 @@
+/*!
+ * TyPrint 管理后台主题
+ * (c) TyPrint Core Team <https://typrint.org>
+ */
+
+@use "variables" as vars;
+@use "../../../node_modules/bootstrap/scss/bootstrap" as bootstrap;
+
+@use "layout";
+@use "buttons";
+@use "forms";
+@use "tables";
+@use "cards";
+@use "utilities";
+
+// 响应式设计调整
+@media (max-width: 767.98px) {
+  // 小屏幕下的样式调整
+  #tp-admin {
+    flex-direction: column;
+    
+    .tp-admin-menu {
+      flex: 0 0 auto;
+    }
+  }
+  
+  .form-table {
+    th, td {
+      display: block;
+      width: 100%;
+    }
+    
+    th {
+      padding-bottom: 0;
+    }
+  }
+}
+
+// 打印样式
+@media print {
+  #tp-admin {
+    .tp-admin-menu,
+    .tp-admin-header {
+      display: none;
+    }
+    
+    .tp-admin-content {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .tp-admin-footer {
+      display: none;
+    }
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
+// 工具类
+.tp-clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.screen-reader-text {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal !important;
+}
+
+// 显示/隐藏
+.hide-if-js {
+  display: none;
+}
+
+// JavaScript 可见性控制类
+.hidden {
+  display: none;
+}
+
+.text-muted {
+  color: vars.$tp-gray-50;
+}
+
+// 边距和间距类
+.mb-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.mt-1 {
+  margin-top: 0.25rem !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+.mt-3 {
+  margin-top: 1rem !important;
+}
+
+.mt-4 {
+  margin-top: 1.5rem !important;
+}
+
+.description {
+  color: vars.$tp-gray-50;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+// 编辑器样式
+.tp-editor-container {
+  border: 1px solid vars.$tp-border-color;
+  border-radius: vars.$border-radius;
+  overflow: hidden;
+}
+
+// TyPrint 特有的辅助类
+.tp-text-primary {
+  color: vars.$tp-blue;
+}
+
+.tp-text-success {
+  color: vars.$tp-green;
+}
+
+.tp-text-warning {
+  color: vars.$tp-yellow;
+}
+
+.tp-text-danger {
+  color: vars.$tp-red;
+}
+
+.tp-bg-primary {
+  background-color: vars.$tp-blue;
+  color: #fff;
+}
+
+.tp-bg-success {
+  background-color: vars.$tp-green;
+  color: #fff;
+}
+
+.tp-bg-warning {
+  background-color: vars.$tp-yellow;
+  color: #fff;
+}
+
+.tp-bg-danger {
+  background-color: vars.$tp-red;
+  color: #fff;
+}
+
+.tp-pill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+} 

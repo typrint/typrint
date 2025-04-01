@@ -1,0 +1,275 @@
+// TyPrint 管理后台主题 - 表单
+
+@use "variables" as vars;
+@use "sass:color";
+
+// 表单控件通用样式
+.form-control {
+  font-size: vars.$tp-font-size-base;
+  color: vars.$tp-gray-80;
+  background-color: #fff;
+  border: 1px solid vars.$tp-gray-20;
+  border-radius: vars.$border-radius;
+  padding: vars.$input-btn-padding-y vars.$input-btn-padding-x;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  
+  &:focus {
+    color: vars.$tp-gray-90;
+    background-color: #fff;
+    border-color: vars.$tp-blue-lighter;
+    outline: 0;
+    box-shadow: 0 0 0 1px vars.$tp-blue-lighter;
+  }
+  
+  &:disabled, &[readonly] {
+    background-color: vars.$tp-gray-5;
+    opacity: 1;
+  }
+  
+  &::placeholder {
+    color: vars.$tp-gray-30;
+    opacity: 1;
+  }
+  
+  &.is-invalid {
+    border-color: vars.$tp-red;
+    
+    &:focus {
+      border-color: vars.$tp-red;
+      box-shadow: 0 0 0 1px color.adjust(vars.$tp-red, $whiteness: 20%);
+    }
+  }
+  
+  &.is-valid {
+    border-color: vars.$tp-green;
+    
+    &:focus {
+      border-color: vars.$tp-green;
+      box-shadow: 0 0 0 1px color.adjust(vars.$tp-green, $whiteness: 40%);
+    }
+  }
+}
+
+// 选择框样式
+.form-select {
+  @extend .form-control;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23646970' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  appearance: none;
+}
+
+// 复选框和单选按钮
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  
+  .form-check-input {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.25rem;
+    margin-right: 0.5rem;
+    vertical-align: top;
+    background-color: #fff;
+    border: 1px solid vars.$tp-gray-30;
+    appearance: none;
+    
+    &[type="checkbox"] {
+      border-radius: 0.2rem;
+      
+      &:checked {
+        background-color: vars.$tp-blue;
+        border-color: vars.$tp-blue;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 0.75rem;
+      }
+    }
+    
+    &[type="radio"] {
+      border-radius: 50%;
+      
+      &:checked {
+        background-color: vars.$tp-blue;
+        border-color: vars.$tp-blue;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3C/svg%3E");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 0.75rem;
+      }
+    }
+    
+    &:focus {
+      border-color: vars.$tp-blue-lighter;
+      outline: 0;
+      box-shadow: 0 0 0 1px vars.$tp-blue-lighter;
+    }
+    
+    &:disabled {
+      pointer-events: none;
+      filter: none;
+      opacity: 0.5;
+    }
+  }
+  
+  .form-check-label {
+    font-size: vars.$tp-font-size-base;
+    color: vars.$tp-gray-80;
+    cursor: pointer;
+  }
+}
+
+.form-switch {
+  @extend .form-check;
+  
+  .form-check-input {
+    width: 2rem;
+    height: 1rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23ffffff' stroke='%23646970' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E");
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-color: vars.$tp-gray-20;
+    border-radius: 2rem;
+    transition: background-position 0.15s ease-in-out;
+    
+    &:checked {
+      background-position: right center;
+      background-color: vars.$tp-blue;
+      border-color: vars.$tp-blue;
+    }
+  }
+}
+
+// 表单组
+.form-group {
+  margin-bottom: 1rem;
+  
+  label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+    color: vars.$tp-gray-90;
+  }
+  
+  .form-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: vars.$tp-gray-50;
+  }
+  
+  .invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: vars.$tp-red;
+  }
+  
+  .valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: vars.$tp-green;
+  }
+}
+
+.form-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  
+  th, td {
+    padding: 1rem;
+    vertical-align: top;
+    border-bottom: 1px solid vars.$tp-border-color;
+  }
+  
+  th {
+    width: 200px;
+    font-weight: 500;
+    text-align: left;
+    color: vars.$tp-gray-90;
+  }
+  
+  .form-group {
+    margin-bottom: 0;
+  }
+  
+  .form-text {
+    margin-top: 0.5rem;
+  }
+}
+
+.form-submit {
+  padding: 1rem 0;
+  margin-top: 1rem;
+  border-top: 1px solid vars.$tp-border-color;
+  
+  .btn + .btn {
+    margin-left: 0.5rem;
+  }
+}
+
+.color-picker {
+  position: relative;
+  width: 40px;
+  height: 30px;
+  border-radius: vars.$border-radius;
+  border: 1px solid vars.$tp-border-color;
+  overflow: hidden;
+  cursor: pointer;
+  
+  input[type="color"] {
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    top: -25%;
+    left: -25%;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+}
+
+.file-upload {
+  border: 2px dashed vars.$tp-border-color;
+  padding: 2rem;
+  text-align: center;
+  border-radius: vars.$border-radius;
+  background-color: vars.$tp-gray-0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: vars.$tp-blue-lighter;
+    background-color: color.adjust(vars.$tp-blue-lighter, $whiteness: 30%);
+  }
+  
+  .upload-icon {
+    font-size: 2rem;
+    color: vars.$tp-gray-50;
+    margin-bottom: 1rem;
+  }
+  
+  .upload-text {
+    color: vars.$tp-gray-70;
+    margin-bottom: 0.5rem;
+  }
+  
+  .upload-hint {
+    font-size: 0.85rem;
+    color: vars.$tp-gray-50;
+  }
+  
+  input[type="file"] {
+    display: none;
+  }
+} 

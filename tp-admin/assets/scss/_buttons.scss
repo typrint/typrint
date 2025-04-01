@@ -1,0 +1,166 @@
+// TyPrint 管理后台主题 - 按钮
+
+@use "variables" as vars;
+@use "sass:color";
+
+// 主要按钮样式，覆盖 Bootstrap 的 .btn 和 .btn-primary
+.btn {
+  font-size: vars.$tp-font-size-base;
+  font-weight: 500;
+  padding: vars.$input-btn-padding-y vars.$input-btn-padding-x;
+  border-radius: vars.$border-radius;
+  transition: all 0.2s ease;
+  
+  &.btn-sm {
+    padding: vars.$input-btn-padding-y-sm vars.$input-btn-padding-x-sm;
+    font-size: 0.85rem;
+  }
+  
+  &.btn-lg {
+    padding: vars.$input-btn-padding-y-lg vars.$input-btn-padding-x-lg;
+    font-size: 1.1rem;
+  }
+  
+  // 主要按钮
+  &.btn-primary {
+    background-color: vars.$tp-button-primary-bg;
+    border-color: vars.$tp-button-primary-border;
+    color: vars.$tp-button-primary-text;
+    
+    &:hover, &:active, &:focus {
+      background-color: vars.$tp-button-primary-hover-bg;
+      border-color: vars.$tp-button-primary-hover-border;
+      color: vars.$tp-button-primary-hover-text;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 1px #fff, 0 0 0 3px vars.$tp-blue;
+    }
+  }
+  
+  // 次要按钮
+  &.btn-secondary {
+    background-color: vars.$tp-button-secondary-bg;
+    border-color: vars.$tp-button-secondary-border;
+    color: vars.$tp-button-secondary-text;
+    
+    &:hover, &:active, &:focus {
+      background-color: vars.$tp-button-secondary-hover-bg;
+      border-color: vars.$tp-button-secondary-hover-border;
+      color: vars.$tp-button-secondary-hover-text;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 1px #fff, 0 0 0 3px vars.$tp-gray-30;
+    }
+  }
+  
+  // 危险按钮
+  &.btn-danger {
+    background-color: vars.$tp-red;
+    border-color: color.adjust(vars.$tp-red, $blackness: 10%);
+    color: white;
+    
+    &:hover, &:active, &:focus {
+      background-color: color.adjust(vars.$tp-red, $blackness: 10%);
+      border-color: color.adjust(vars.$tp-red, $blackness: 15%);
+      color: white;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 1px #fff, 0 0 0 3px color.adjust(vars.$tp-red, $whiteness: 20%);
+    }
+  }
+  
+  // 成功按钮
+  &.btn-success {
+    background-color: vars.$tp-green;
+    border-color: color.adjust(vars.$tp-green, $blackness: 10%);
+    color: white;
+    
+    &:hover, &:active, &:focus {
+      background-color: color.adjust(vars.$tp-green, $blackness: 10%);
+      border-color: color.adjust(vars.$tp-green, $blackness: 15%);
+      color: white;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 1px #fff, 0 0 0 3px color.adjust(vars.$tp-green, $whiteness: 40%);
+    }
+  }
+
+  &.btn-link {
+    color: vars.$tp-blue;
+    text-decoration: none;
+    padding: 0;
+    background: none;
+    border: none;
+    
+    &:hover, &:active, &:focus {
+      color: vars.$tp-blue-darker;
+      text-decoration: underline;
+    }
+    
+    &:focus {
+      box-shadow: none;
+      outline: 1px dotted vars.$tp-blue;
+    }
+  }
+  
+  // 禁用状态
+  &:disabled, &.disabled {
+    background-color: vars.$tp-gray-5;
+    border-color: vars.$tp-gray-20;
+    color: vars.$tp-gray-50;
+    cursor: not-allowed;
+    opacity: 0.7;
+    
+    &:hover {
+      background-color: vars.$tp-gray-5;
+      border-color: vars.$tp-gray-20;
+      color: vars.$tp-gray-50;
+    }
+  }
+}
+
+// 按钮组
+.btn-group {
+  .btn {
+    &:not(:first-child) {
+      margin-left: -1px;
+    }
+    
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+}
+
+.btn-icon {
+  padding: 0.25rem;
+  line-height: 1;
+  border-radius: vars.$border-radius;
+  
+  i, .icon {
+    font-size: 1.2rem;
+  }
+}
+
+.btn-add-new {
+  display: inline-flex;
+  align-items: center;
+  
+  .icon {
+    margin-right: 0.3rem;
+  }
+}
+
+.btn-apply, .btn-save, .btn-update {
+  min-width: 100px;
+} 

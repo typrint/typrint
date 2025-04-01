@@ -9,8 +9,14 @@
 	"repository": {
 		"url": "https://github.com/typrint/typrint"
 	},
+	"scripts": {
+		"compile:scss": "sass tp-admin/assets/scss/main.scss:tp-admin/assets/css/tp-admin.css --style=compressed",
+		"watch:scss": "sass tp-admin/assets/scss/main.scss:tp-admin/assets/css/tp-admin.css --style=compressed --watch"
+	},
 	"devDependencies": {
-		"chokidar": "^4.0.3"
+		"bootstrap": "^5.3.3",
+		"chokidar": "^4.0.3",
+		"sass": "1.77.6"
 	},
 	"packageManager": "pnpm@10.7.0+sha512.6b865ad4b62a1d9842b61d674a393903b871d9244954f652b8842c2b553c72176b278f64c463e52d40fff8aba385c235c8c9ecf5cc7de4fd78b8bb6d49633ab6"
 }

@@ -1,0 +1,325 @@
+// TyPrint 管理后台主题 - 卡片和通知
+
+@use "variables" as vars;
+@use "sass:color";
+
+// 卡片通用样式（覆盖 Bootstrap 的 .card）
+.card {
+  border: 1px solid vars.$tp-border-color;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$box-shadow-sm;
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  
+  .card-header {
+    padding: 0.75rem 1rem;
+    background-color: vars.$tp-gray-0;
+    border-bottom: 1px solid vars.$tp-border-color;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .card-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .card-footer {
+    padding: 0.75rem 1rem;
+    background-color: vars.$tp-gray-0;
+    border-top: 1px solid vars.$tp-border-color;
+  }
+}
+
+.tp-dashboard-card {
+  @extend .card;
+  height: 100%;
+  
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    
+    .card-value {
+      font-size: 2rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: vars.$tp-gray-90;
+    }
+    
+    .card-description {
+      color: vars.$tp-gray-60;
+      font-size: 0.9rem;
+      margin-top: auto;
+    }
+  }
+  
+  // 不同的颜色变种
+  &.card-primary {
+    border-top: 2px solid vars.$tp-blue;
+    
+    .card-value {
+      color: vars.$tp-blue;
+    }
+  }
+  
+  &.card-success {
+    border-top: 2px solid vars.$tp-green;
+    
+    .card-value {
+      color: vars.$tp-green;
+    }
+  }
+  
+  &.card-warning {
+    border-top: 2px solid vars.$tp-yellow;
+    
+    .card-value {
+      color: vars.$tp-yellow;
+    }
+  }
+  
+  &.card-danger {
+    border-top: 2px solid vars.$tp-red;
+    
+    .card-value {
+      color: vars.$tp-red;
+    }
+  }
+}
+
+.tp-quickdraft-card {
+  @extend .card;
+  
+  .card-body {
+    padding: 1rem;
+    
+    .quickdraft-title {
+      margin-bottom: 1rem;
+    }
+    
+    .quickdraft-content {
+      margin-bottom: 1rem;
+    }
+    
+    .quickdraft-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .quickdraft-save {
+        min-width: 80px;
+      }
+    }
+  }
+}
+
+.tp-activity-card {
+  @extend .card;
+  
+  .activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid vars.$tp-border-color;
+      display: flex;
+      align-items: flex-start;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .activity-icon {
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        margin-right: 0.75rem;
+        background-color: vars.$tp-gray-5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: vars.$tp-gray-50;
+        
+        &.icon-post {
+          background-color: color.adjust(vars.$tp-blue, $alpha: -0.9);
+          color: vars.$tp-blue;
+        }
+        
+        &.icon-page {
+          background-color: color.adjust(vars.$tp-green, $alpha: -0.9);
+          color: vars.$tp-green;
+        }
+        
+        &.icon-comment {
+          background-color: color.adjust(vars.$tp-yellow, $alpha: -0.9);
+          color: vars.$tp-yellow;
+        }
+        
+        &.icon-user {
+          background-color: color.adjust(vars.$tp-gray-60, $alpha: -0.9);
+          color: vars.$tp-gray-60;
+        }
+      }
+      
+      .activity-content {
+        flex: 1;
+        
+        .activity-title {
+          font-weight: 500;
+          margin: 0 0 0.25rem 0;
+          
+          a {
+            color: vars.$tp-gray-90;
+            text-decoration: none;
+            
+            &:hover {
+              color: vars.$tp-blue;
+            }
+          }
+        }
+        
+        .activity-meta {
+          font-size: 0.85rem;
+          color: vars.$tp-gray-50;
+          
+          a {
+            color: vars.$tp-blue;
+            text-decoration: none;
+            
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .card-footer {
+    text-align: center;
+    
+    a {
+      color: vars.$tp-blue;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: vars.$border-radius;
+  display: flex;
+  align-items: center;
+  
+  .alert-icon {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+  }
+  
+  .alert-content {
+    flex: 1;
+    
+    .alert-title {
+      font-weight: 500;
+      margin: 0 0 0.25rem 0;
+    }
+    
+    .alert-text {
+      margin: 0;
+    }
+  }
+  
+  .alert-close {
+    margin-left: 0.75rem;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    opacity: 0.5;
+    
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+
+  &.alert-info {
+    background-color: #f0f6fc;
+    border-color: #c5d5e5;
+    color: #4d6983;
+  }
+  
+  &.alert-success {
+    background-color: #f0f7f2;
+    border-color: #c3e6cb;
+    color: #0c6b1c;
+  }
+  
+  &.alert-warning {
+    background-color: #f8f5e9;
+    border-color: #f1dfb7;
+    color: #9a7a1c;
+  }
+  
+  &.alert-danger {
+    background-color: #fcf2f2;
+    border-color: #f1c0c0;
+    color: #bc1b1b;
+  }
+
+  &.alert-update {
+    background-color: #f0f6fc;
+    border-color: #c5d5e5;
+    color: #4d6983;
+    padding: 1rem;
+    
+    .update-message {
+      display: flex;
+      align-items: center;
+      
+      .update-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+        color: vars.$tp-blue;
+      }
+      
+      .update-content {
+        flex: 1;
+        
+        .update-title {
+          font-size: 1.1rem;
+          font-weight: 500;
+          margin: 0 0 0.25rem 0;
+        }
+        
+        .update-text {
+          margin: 0;
+        }
+      }
+    }
+  }
+} 
