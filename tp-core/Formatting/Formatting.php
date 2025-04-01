@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace TP\Formatting;
 
 use TP\Facades\Hook;
+use TP\L10n\L10n;
 
 class Formatting
 {
@@ -2305,11 +2306,11 @@ class Formatting
             'tp_sprintf_l',
             [
                 /* translators: Used to join items in a list with more than 2 items. */
-                'between' => sprintf(__('%1$s, %2$s'), '', ''),
+                'between' => sprintf(L10n::__('%1$s, %2$s'), '', ''),
                 /* translators: Used to join last two items in a list with more than 2 times. */
-                'between_last_two' => sprintf(__('%1$s, and %2$s'), '', ''),
+                'between_last_two' => sprintf(L10n::__('%1$s, and %2$s'), '', ''),
                 /* translators: Used to join items in a list with only 2 items. */
-                'between_only_two' => sprintf(__('%1$s and %2$s'), '', ''),
+                'between_only_two' => sprintf(L10n::__('%1$s and %2$s'), '', ''),
             ]
         );
 

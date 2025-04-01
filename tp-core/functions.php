@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 use TP\Facades\Hook;
 use TP\Formatting\Formatting;
+use TP\L10n\L10n;
 
 /**
  * Converts float number to format based on the locale.
@@ -65,28 +66,28 @@ function size_format(int|string $bytes, int $decimals = 0): false|string
 {
     $quant = [
         /* translators: Unit symbol for yottabyte. */
-        _x('YB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+        L10n::_x('YB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
         /* translators: Unit symbol for zettabyte. */
-        _x('ZB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+        L10n::_x('ZB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
         /* translators: Unit symbol for exabyte. */
-        _x('EB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+        L10n::_x('EB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
         /* translators: Unit symbol for petabyte. */
-        _x('PB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024,
+        L10n::_x('PB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024,
         /* translators: Unit symbol for terabyte. */
-        _x('TB', 'unit symbol') => 1024 * 1024 * 1024 * 1024,
+        L10n::_x('TB', 'unit symbol') => 1024 * 1024 * 1024 * 1024,
         /* translators: Unit symbol for gigabyte. */
-        _x('GB', 'unit symbol') => 1024 * 1024 * 1024,
+        L10n::_x('GB', 'unit symbol') => 1024 * 1024 * 1024,
         /* translators: Unit symbol for megabyte. */
-        _x('MB', 'unit symbol') => 1024 * 1024,
+        L10n::_x('MB', 'unit symbol') => 1024 * 1024,
         /* translators: Unit symbol for kilobyte. */
-        _x('KB', 'unit symbol') => 1024,
+        L10n::_x('KB', 'unit symbol') => 1024,
         /* translators: Unit symbol for byte. */
-        _x('B', 'unit symbol') => 1,
+        L10n::_x('B', 'unit symbol') => 1,
     ];
 
     if (0 === $bytes) {
         /* translators: Unit symbol for byte. */
-        return number_format_i18n(0, $decimals).' '._x('B', 'unit symbol');
+        return number_format_i18n(0, $decimals).' '.L10n::_x('B', 'unit symbol');
     }
 
     foreach ($quant as $unit => $mag) {
@@ -1286,7 +1287,7 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
         if ($replacement) {
             $message = sprintf(
                 /* translators: 1: WordPress hook name, 2: Version number, 3: Alternative hook name. */
-                __('Hook %1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.'),
+                L10n::__('Hook %1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.'),
                 $hook,
                 $version,
                 $replacement
@@ -1294,7 +1295,7 @@ function tp_deprecated_hook(string $hook, string $version, string $replacement =
         } else {
             $message = sprintf(
                 /* translators: 1: WordPress hook name, 2: Version number. */
-                __('Hook %1$s is <strong>deprecated</strong> since version %2$s with no alternative available.'),
+                L10n::__('Hook %1$s is <strong>deprecated</strong> since version %2$s with no alternative available.'),
                 $hook,
                 $version
             ).$message;
@@ -1352,13 +1353,13 @@ function _doing_it_wrong(string $function_name, string $message, string $version
 
             $message .= ' '.sprintf(
                 /* translators: %s: Documentation URL. */
-                __('Please see <a href="%s">Debugging in WordPress</a> for more information.'),
-                __('https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/')
+                L10n::__('Please see <a href="%s">Debugging in WordPress</a> for more information.'),
+                L10n::__('https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/')
             );
 
             $message = sprintf(
                 /* translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: WordPress version number. */
-                __('Function %1$s was called <strong>incorrectly</strong>. %2$s %3$s'),
+                L10n::__('Function %1$s was called <strong>incorrectly</strong>. %2$s %3$s'),
                 $function_name,
                 $message,
                 $version
@@ -1614,7 +1615,7 @@ function tp_fast_hash(
 ): string {
     try {
         $hashed = sodium_crypto_generichash($message, 'tp_fast_hash', 30);
-    } catch (SodiumException $e) {
+    } catch (SodiumException) {
         // If the Sodium extension is not available, fall back to a generic hash function.
         $hashed = hash('sha256', $message, true);
     }
@@ -1622,7 +1623,7 @@ function tp_fast_hash(
     // Encode the hash in a URL-safe base64 format without padding.
     try {
         $encoded = sodium_bin2base64($hashed, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
-    } catch (SodiumException $e) {
+    } catch (SodiumException) {
         // If the Sodium extension is not available, fall back to a generic base64 encoding.
         $encoded = base64_encode($hashed);
     }
@@ -1821,7 +1822,7 @@ function tp_rand(?int $min = null, ?int $max = null): int
         $val = random_int($min, $max);
 
         return abs($val);
-    } catch (Error|Exception $e) {
+    } catch (Error|Exception) {
         $rnd_value = md5(uniqid(microtime().mt_rand(), true));
         // Take the first 8 digits for our value.
         $value = substr($rnd_value, 0, 8);
