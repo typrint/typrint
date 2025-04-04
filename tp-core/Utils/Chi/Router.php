@@ -50,24 +50,6 @@ class Router implements RequestHandlerInterface
     }
 
     /**
-     * Handles the request and returns a response.
-     */
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        if (empty($this->middlewares)) {
-            return $this->routeHTTP($request);
-        }
-
-        // Apply middleware chain
-        $handler = $this->middlewares[0];
-        for ($i = 1; $i < count($this->middlewares); ++$i) {
-            $handler = $this->middlewares[$i]($handler);
-        }
-
-        return $handler($request);
-    }
-
-    /**
      * Add middleware to the router.
      *
      * @param callable[] $middlewares
@@ -250,9 +232,27 @@ class Router implements RequestHandlerInterface
     }
 
     /**
+     * Handles the request and returns a response.
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        if (empty($this->middlewares)) {
+            return $this->handleHTTP($request);
+        }
+
+        // Apply middleware chain
+        $handler = $this->middlewares[0];
+        for ($i = 1; $i < count($this->middlewares); ++$i) {
+            $handler = $this->middlewares[$i]($handler);
+        }
+
+        return $handler($request);
+    }
+
+    /**
      * Core HTTP routing method.
      */
-    private function routeHTTP(ServerRequestInterface $request): ResponseInterface
+    private function handleHTTP(ServerRequestInterface $request): ResponseInterface
     {
         // Get route path from request
         $routePath = $request->getUri()->getPath();
@@ -268,24 +268,24 @@ class Router implements RequestHandlerInterface
         }
 
         // Find the route
-        $routeContext = new Context();
-        $handler = $this->tree->findRoute($routeContext, $method, $routePath)['handler'] ?? null;
+        $context = new Context();
+        $handler = $this->tree->findRoute($context, $method, $routePath)['handler'] ?? null;
 
         if (null !== $handler) {
             // Add route parameters to the request
             $request = $request->withAttribute('routeParams', [
-                'keys' => $routeContext->routeParams->keys,
-                'values' => $routeContext->routeParams->values,
+                'keys' => $context->routeParams->keys,
+                'values' => $context->routeParams->values,
             ]);
 
             // Add route pattern to the request
-            $request = $request->withAttribute('routePattern', $routeContext->routePattern);
+            $request = $request->withAttribute('routePattern', $context->routePattern);
 
             return $handler($request);
         }
 
-        if ($routeContext->methodNotAllowed) {
-            return $this->getMethodNotAllowedHandler($routeContext->methodsAllowed)($request);
+        if ($context->methodNotAllowed) {
+            return $this->getMethodNotAllowedHandler($context->methodsAllowed)($request);
         }
 
         return $this->getNotFoundHandler()($request);
