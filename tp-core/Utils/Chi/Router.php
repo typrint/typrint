@@ -328,7 +328,7 @@ class Router implements RequestHandlerInterface
         }
 
         return function (ServerRequestInterface $request): ResponseInterface {
-            return Util::response(404, [], 'Not Found');
+            return Utils::response(404, [], 'Not Found');
         };
     }
 
@@ -347,7 +347,7 @@ class Router implements RequestHandlerInterface
                 $methods[] = MethodType::$reverseMethodMap[$m];
             }
 
-            return Util::response(405, ['Allow' => implode(', ', $methods)], 'Method Not Allowed');
+            return Utils::response(405, ['Allow' => implode(', ', $methods)], 'Method Not Allowed');
         };
     }
 

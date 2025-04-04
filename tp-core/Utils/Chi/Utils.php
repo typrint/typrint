@@ -17,7 +17,7 @@ use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class Util
+class Utils
 {
     /**
      * Helper function to create a PSR-7 response.

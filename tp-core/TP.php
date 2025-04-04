@@ -17,7 +17,6 @@ use TP\Cache\Cache;
 use TP\Cli\Color;
 use TP\DB\DB;
 use TP\DB\Migrator\Migrator;
-use TP\Filesystem\Watcher\Watcher;
 use TP\Hook\Hook;
 use TP\Route\Route;
 use TP\Utils\Async;
@@ -37,7 +36,8 @@ class TP
     public function run(): void
     {
         $wg = new WaitGroup();
-        $this->beforeRun();
+
+        Color::printf(Color::GREEN, "Starting TyPrint...\n");
 
         Hook::init();
         DB::init();
@@ -51,14 +51,6 @@ class TP
             defer(fn () => $wg->done());
             Route::instance()->listen();
         });
-
-        // Listen file changes
-        $watcher = new Watcher();
-        $watcher->setPaths(ABSPATH);
-        $watcher->onAnyChange(function ($event, $path) {
-            echo "File {$path} has been {$event}\n";
-        });
-        Async::run($watcher->startFn());
 
         Color::printf(Color::GREEN, "TyPrint is ready!\n");
 
@@ -75,22 +67,5 @@ class TP
         });
 
         $wg->wait();
-
-        Color::printf(Color::GREEN, "TyPrint stopped, bye!\n");
-    }
-
-    private function beforeRun(): void
-    {
-        $logo = <<<EOT
-              ______      ____               __
-             /_  __/_  __/ __ \_____(_)___  / /_
-              / / / / / / /_/ / ___/ / __ \/ __/
-             / / / /_/ / ____/ /  / / / / / /_
-            /_/  \___ /_/   /_/  /_/_/ /_/\__/
-                /____/
-            EOT;
-
-        Color::printf(null, $logo."\n");
-        Color::printf(Color::GREEN, "Starting TyPrint...\n");
     }
 }

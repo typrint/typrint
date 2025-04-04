@@ -31,7 +31,9 @@
         "ext-exif": "*",
         "ext-fileinfo": "*",
         "ext-json": "*",
+        "ext-pcntl": "*",
         "ext-pdo": "*",
+        "ext-posix": "*",
         "ext-sodium": "*",
         "ext-swow": "*",
         "gettext/gettext": "^5.7",
@@ -40,12 +42,12 @@
         "psr/http-message": "^2.0",
         "psr/http-server-handler": "^1.0",
         "psr/simple-cache": "^3.0",
+        "swow/swow": "^1.5",
         "symfony/process": "^7.2",
         "typrint/phinx": "^1.0"
     },
     "require-dev": {
-        "php-cs-fixer/shim": "^3.72",
-        "swow/swow": "^1.5"
+        "php-cs-fixer/shim": "^3.72"
     },
     "config": {
         "optimize-autoloader": true,

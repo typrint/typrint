@@ -15,7 +15,7 @@ namespace TP\Admin;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TP\Utils\Chi\Util;
+use TP\Utils\Chi\Utils;
 
 class Route
 {
@@ -23,6 +23,6 @@ class Route
 
     public static function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return Util::response(200, [], 'ok');
+        return Utils::response(200, [], 'ok');
     }
 }
