@@ -55,11 +55,11 @@ class Route
         $this->router->any('/tp-admin/*', fn (ServerRequestInterface $request): ResponseInterface => AdminRoute::handle($request));
     }
 
-    public function listen(): callable
+    public function listen(): void
     {
         $this->server->setHandler(fn (ServerRequestInterface $request): ResponseInterface => $this->router->handle($request));
 
-        return fn () => $this->server->start();
+        $this->server->start();
     }
 
     public function shutdown(): void

@@ -21,8 +21,10 @@ use TP\Filesystem\Watcher\Watcher;
 use TP\Hook\Hook;
 use TP\Route\Route;
 use TP\Utils\Async;
-use TP\Utils\Channel;
 use TP\Utils\Signal;
+use TP\Utils\WaitGroup;
+
+use function Swow\defer;
 
 class TP
 {
@@ -34,7 +36,7 @@ class TP
 
     public function run(): void
     {
-        $channel = new Channel();
+        $wg = new WaitGroup();
         $this->beforeRun();
 
         Hook::init();
@@ -43,7 +45,12 @@ class TP
         Route::init();
 
         Migrator::run();
-        Async::run(Route::instance()->listen());
+
+        $wg->add(1);
+        Async::run(static function () use ($wg): void {
+            defer(fn () => $wg->done());
+            Route::instance()->listen();
+        });
 
         // Listen file changes
         $watcher = new Watcher();
@@ -56,20 +63,18 @@ class TP
         Color::printf(Color::GREEN, "TyPrint is ready!\n");
 
         // Handle signals for graceful shutdown
-        Async::run(static function () use ($channel): void {
+        Async::run(static function (): void {
             Signal::wait(Signal::INT);
             Color::printf(Color::GREEN, "Stopping TyPrint...\n");
             Route::instance()->shutdown();
-            $channel->push(1);
         });
-        Async::run(static function () use ($channel): void {
+        Async::run(static function (): void {
             Signal::wait(Signal::TERM);
             Color::printf(Color::GREEN, "Stopping TyPrint...\n");
             Route::instance()->shutdown();
-            $channel->push(1);
         });
 
-        $channel->pop();
+        $wg->wait();
 
         Color::printf(Color::GREEN, "TyPrint stopped, bye!\n");
     }
