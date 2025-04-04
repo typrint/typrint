@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace TP\Utils;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Swow\Coroutine;
 use Swow\CoroutineException;
@@ -55,15 +54,9 @@ class Server
                             try {
                                 /** @var ServerRequestInterface $request */
                                 $request = $connection->recvHttpRequest();
-                                $response = $handler($request);
+                                $response = $handler($connection, $request);
                                 if (null !== $response) {
-                                    if ($response instanceof ResponseInterface) {
-                                        $connection->sendHttpResponse($response);
-                                    } elseif (is_array($response)) {
-                                        $connection->respond(...$response);
-                                    } else {
-                                        $connection->respond($response);
-                                    }
+                                    $connection->sendHttpResponse($response);
                                 }
                             } catch (HttpProtocolException $exception) {
                                 $connection->error($exception->getCode(), $exception->getMessage(), close: true);

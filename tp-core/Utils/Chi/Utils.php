@@ -30,10 +30,6 @@ class Utils
      */
     public static function response(int $status = 200, array $headers = [], string|StreamInterface|null $body = null, string $version = '1.1', ?string $reason = null): ResponseInterface
     {
-        if (!isset($headers['Connection'])) {
-            $headers['Connection'] = 'close';
-        }
-
         if (!isset($headers['Content-Type'])) {
             $headers['Content-Type'] = self::determineContentType($body);
         }

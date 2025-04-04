@@ -15,7 +15,9 @@ namespace TP\Route;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Swow\Psr7\Server\ServerConnection;
 use TP\Admin\Route as AdminRoute;
+use TP\Facades\Hook;
 use TP\Utils\Chi\Router;
 use TP\Utils\Once;
 use TP\Utils\Server;
@@ -53,11 +55,32 @@ class Route
     {
         $this->router->any('/tp-admin', fn (ServerRequestInterface $request): ResponseInterface => AdminRoute::handle($request));
         $this->router->any('/tp-admin/*', fn (ServerRequestInterface $request): ResponseInterface => AdminRoute::handle($request));
+        $this->router->any('/*', fn (ServerRequestInterface $request): ResponseInterface => self::handle($request));
+    }
+
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        Hook::doAction('before_request', $request);
+
+        Hook::doAction('after_request', $request);
+
+        Hook::doAction('before_response', $request);
+        $response = $this->router->handle($request);
+        Hook::doAction('after_response', $response);
+
+        return $response;
     }
 
     public function listen(): void
     {
-        $this->server->setHandler(fn (ServerRequestInterface $request): ResponseInterface => $this->router->handle($request));
+        $this->server->setHandler(static function (ServerConnection $connection, ServerRequestInterface $request): ResponseInterface {
+            $response = $this->router->handle($request);
+
+            // Set the Connection header before sending the response
+            $response = $response->withHeader('Connection', $connection->shouldKeepAlive() ? 'keep-alive' : 'close');
+
+            return $response;
+        });
 
         $this->server->start();
     }

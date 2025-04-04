@@ -18,6 +18,7 @@ use TP\Cli\Color;
 use TP\DB\DB;
 use TP\DB\Migrator\Migrator;
 use TP\Hook\Hook;
+use TP\Loader\PluginLoader;
 use TP\Route\Route;
 use TP\Utils\Async;
 use TP\Utils\Signal;
@@ -46,6 +47,10 @@ class TP
 
         Migrator::run();
 
+        Hook::instance()->doAction('before_load_plugins');
+        PluginLoader::instance();
+        Hook::instance()->doAction('after_load_plugins');
+
         $wg->add(1);
         Async::run(static function () use ($wg): void {
             defer(fn () => $wg->done());
@@ -53,6 +58,7 @@ class TP
         });
 
         Color::printf(Color::GREEN, "TyPrint is ready!\n");
+        Hook::instance()->doAction('after_start');
 
         // Handle signals for graceful shutdown
         Async::run(static function (): void {
@@ -67,5 +73,6 @@ class TP
         });
 
         $wg->wait();
+        Hook::instance()->doAction('before_shutdown');
     }
 }

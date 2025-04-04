@@ -35,6 +35,7 @@ TyPrint 使用 Bootstrap 5 作为前端框架，使用 jQuery 作为 JavaScript 
 |   ├── Asset/ 资源加载 API
 │   ├── Cache/ 缓存 API
 │   ├── Cli/ 命令行 API
+│   ├── Content/ 内容 API
 │   ├── Context/ 上下文 API
 │   ├── Cron/ 计划任务 API
 │   ├── DB/ 数据库 API
@@ -42,8 +43,11 @@ TyPrint 使用 Bootstrap 5 作为前端框架，使用 jQuery 作为 JavaScript 
 │   ├── Filesystem/ 文件系统 API
 │   ├── Hook/ 钩子 API
 │   ├── Http/ HTTP 请求 API
+│   ├── L10n/ 本地化 API
+│   ├── Loader/ 插件/主题加载器
 │   ├── Log/ 日志 API
 │   ├── Route/ 路由 API
+│   ├── Taxonomy/ 分类法 API
 │   ├── Utils/ 工具函数
 │   ├── TP.php 主类
 │   └── Version.php 版本号定义
