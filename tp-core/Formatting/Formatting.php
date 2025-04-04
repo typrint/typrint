@@ -69,21 +69,21 @@ class Formatting
     {
         $quant = [
             /* translators: Unit symbol for yottabyte. */
-            L10n::_x('YB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+            L10n::_x('YB', 'unit symbol') => YB_IN_BYTES,
             /* translators: Unit symbol for zettabyte. */
-            L10n::_x('ZB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+            L10n::_x('ZB', 'unit symbol') => ZB_IN_BYTES,
             /* translators: Unit symbol for exabyte. */
-            L10n::_x('EB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+            L10n::_x('EB', 'unit symbol') => EB_IN_BYTES,
             /* translators: Unit symbol for petabyte. */
-            L10n::_x('PB', 'unit symbol') => 1024 * 1024 * 1024 * 1024 * 1024,
+            L10n::_x('PB', 'unit symbol') => PB_IN_BYTES,
             /* translators: Unit symbol for terabyte. */
-            L10n::_x('TB', 'unit symbol') => 1024 * 1024 * 1024 * 1024,
+            L10n::_x('TB', 'unit symbol') => TB_IN_BYTES,
             /* translators: Unit symbol for gigabyte. */
-            L10n::_x('GB', 'unit symbol') => 1024 * 1024 * 1024,
+            L10n::_x('GB', 'unit symbol') => GB_IN_BYTES,
             /* translators: Unit symbol for megabyte. */
-            L10n::_x('MB', 'unit symbol') => 1024 * 1024,
+            L10n::_x('MB', 'unit symbol') => MB_IN_BYTES,
             /* translators: Unit symbol for kilobyte. */
-            L10n::_x('KB', 'unit symbol') => 1024,
+            L10n::_x('KB', 'unit symbol') => KB_IN_BYTES,
             /* translators: Unit symbol for byte. */
             L10n::_x('B', 'unit symbol') => 1,
         ];

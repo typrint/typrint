@@ -31,6 +31,7 @@
         "ext-exif": "*",
         "ext-fileinfo": "*",
         "ext-json": "*",
+        "ext-mbstring": "*",
         "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-posix": "*",

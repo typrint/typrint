@@ -49,7 +49,7 @@ class LogManager
     /**
      * The log file path.
      */
-    protected string $logFile = ABSPATH.'/tp-content/debug.log';
+    protected string $logFile = TP_CONTENT_DIR.'/debug.log';
 
     /**
      * Get the singleton instance of the log manager.

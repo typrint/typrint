@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace TP\Loader;
 
 use TP\Facades\Filesystem;
+use TP\Facades\Hook;
 use TP\Facades\Log;
 
 /**
  * Plugin loader for TyPrint.
  *
- * Manages the discovery, metadata extraction, and loading of plugins
- * from the tp-content/plugins directory.
+ * Manages the discovery, metadata extraction, and loading of plugins.
  */
 class PluginLoader
 {
@@ -32,7 +32,7 @@ class PluginLoader
     /**
      * The directory where plugins are stored.
      */
-    protected string $pluginsDir = ABSPATH.'/tp-content/plugins';
+    protected string $pluginsDir = TP_CONTENT_DIR.'/plugins';
 
     /**
      * Array of loaded plugins.
@@ -54,8 +54,9 @@ class PluginLoader
         'License' => 'license',
         'License URI' => 'licenseUri',
         'Text Domain' => 'textDomain',
-        'Domain Path' => 'domainPath',
-        'Requires TyPrint' => 'requiresTyPrint',
+        // 'Domain Path' => 'domainPath',
+        'Network' => 'network',
+        'Requires at least' => 'requiresTyPrint',
         'Requires PHP' => 'requiresPhp',
     ];
 
@@ -76,13 +77,14 @@ class PluginLoader
      */
     protected function __construct()
     {
-        $this->discoverPlugins();
+        $this->discover();
+        $this->load();
     }
 
     /**
      * Discover all plugins in the plugins directory.
      */
-    public function discoverPlugins(): void
+    public function discover(): void
     {
         if (!Filesystem::isDir($this->pluginsDir)) {
             Log::warning('Plugins directory does not exist');
@@ -97,38 +99,26 @@ class PluginLoader
             $pluginPath = $this->pluginsDir.'/'.$item;
 
             // Handle single-file plugins
-            if (Filesystem::isFile($pluginPath) && $this->hasPluginExtension($pluginPath)) {
-                $this->processPluginFile($pluginPath);
+            if (Filesystem::isFile($pluginPath) && 'php' === pathinfo($pluginPath, PATHINFO_EXTENSION)) {
+                $this->processFile($pluginPath);
                 continue;
             }
 
             // Handle directory plugins
             if (Filesystem::isDir($pluginPath)) {
-                $this->processPluginDirectory($pluginPath, $item);
+                $this->processDirectory($pluginPath, $item);
             }
         }
     }
 
     /**
-     * Check if a file has a valid plugin extension (.php).
-     *
-     * @param string $filePath The file path to check
-     *
-     * @return bool Whether the file has a valid plugin extension
-     */
-    protected function hasPluginExtension(string $filePath): bool
-    {
-        return 'php' === pathinfo($filePath, PATHINFO_EXTENSION);
-    }
-
-    /**
-     * Process a single-file plugin.
+     * Process a single plugin file.
      *
      * @param string $filePath The path to the plugin file
      */
-    protected function processPluginFile(string $filePath): void
+    protected function processFile(string $filePath): void
     {
-        $pluginData = $this->extractPluginData($filePath);
+        $pluginData = $this->parseData($filePath);
         if (!empty($pluginData['name'])) {
             $plugin = new Plugin(
                 basename($filePath),
@@ -146,7 +136,7 @@ class PluginLoader
      * @param string $dirPath The path to the plugin directory
      * @param string $dirName The directory name
      */
-    protected function processPluginDirectory(string $dirPath, string $dirName): void
+    protected function processDirectory(string $dirPath, string $dirName): void
     {
         // Look for the main plugin file (same name as directory or index.php)
         $mainFile = $dirPath.'/'.$dirName.'.php';
@@ -158,7 +148,7 @@ class PluginLoader
             }
         }
 
-        $pluginData = $this->extractPluginData($mainFile);
+        $pluginData = $this->parseData($mainFile);
         if (!empty($pluginData['name'])) {
             $plugin = new Plugin(
                 $dirName,
@@ -171,13 +161,13 @@ class PluginLoader
     }
 
     /**
-     * Extract plugin metadata from a file.
+     * Parse plugin metadata from a file.
      *
      * @param string $filePath The path to the plugin file
      *
      * @return array The plugin metadata
      */
-    protected function extractPluginData(string $filePath): array
+    protected function parseData(string $filePath): array
     {
         $defaultHeaders = array_fill_keys(array_values($this->headerFields), '');
 
@@ -205,23 +195,13 @@ class PluginLoader
     }
 
     /**
-     * Get all discovered plugins.
-     *
-     * @return Plugin[] Array of plugins
-     */
-    public function getPlugins(): array
-    {
-        return $this->plugins;
-    }
-
-    /**
      * Get a specific plugin by slug.
      *
      * @param string $slug The plugin slug
      *
      * @return Plugin|null The plugin or null if not found
      */
-    public function getPlugin(string $slug): ?Plugin
+    public function get(string $slug): ?Plugin
     {
         return $this->plugins[$slug] ?? null;
     }
@@ -233,7 +213,7 @@ class PluginLoader
      *
      * @return bool Whether the plugin exists
      */
-    public function hasPlugin(string $slug): bool
+    public function has(string $slug): bool
     {
         return isset($this->plugins[$slug]);
     }
@@ -246,5 +226,29 @@ class PluginLoader
     public function count(): int
     {
         return count($this->plugins);
+    }
+
+    /**
+     * Get all loaded plugins.
+     *
+     * @return iterable An iterable of loaded plugins
+     */
+    public function all(): iterable
+    {
+        yield from $this->plugins;
+    }
+
+    /**
+     * Load plugins.
+     */
+    protected function load(): void
+    {
+        foreach ($this->all() as $plugin) {
+            if ($plugin->isActive()) {
+                Hook::doAction('before_load_plugin', $plugin);
+                include_once $plugin->getFile();
+                Hook::doAction('after_load_plugin', $plugin);
+            }
+        }
     }
 }

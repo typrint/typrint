@@ -40,6 +40,7 @@ class TP
 
         Color::printf(Color::GREEN, "Starting TyPrint...\n");
 
+        Constants::init();
         Hook::init();
         DB::init();
         Cache::init();
