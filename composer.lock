@@ -696,16 +696,16 @@
         },
         {
             "name": "swow/swow",
-            "version": "v1.6.1",
+            "version": "v1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swow/swow.git",
-                "reference": "0a403efcf4073b5b193a86c5c8ecd1a9f8ffe093"
+                "reference": "7aa2fa652baf621d21fd87cb74d8a6a7b5a70f9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swow/swow/zipball/0a403efcf4073b5b193a86c5c8ecd1a9f8ffe093",
-                "reference": "0a403efcf4073b5b193a86c5c8ecd1a9f8ffe093",
+                "url": "https://api.github.com/repos/swow/swow/zipball/7aa2fa652baf621d21fd87cb74d8a6a7b5a70f9a",
+                "reference": "7aa2fa652baf621d21fd87cb74d8a6a7b5a70f9a",
                 "shasum": ""
             },
             "require": {
@@ -777,9 +777,9 @@
             ],
             "support": {
                 "issues": "https://github.com/swow/swow",
-                "source": "https://github.com/swow/swow/tree/v1.6.1"
+                "source": "https://github.com/swow/swow/tree/v1.6.2"
             },
-            "time": "2025-08-10T22:24:12+00:00"
+            "time": "2025-11-03T12:41:01+00:00"
         },
         {
             "name": "symfony/config",
