@@ -44,7 +44,7 @@
         "psr/http-server-handler": "^1.0",
         "psr/simple-cache": "^3.0",
         "swow/swow": "^1.5",
-        "symfony/process": "^7.2",
+        "symfony/process": "^8.0",
         "typrint/phinx": "^1.0"
     },
     "require-dev": {
