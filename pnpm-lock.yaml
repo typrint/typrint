@@ -61,8 +61,8 @@ packages:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
 
-  immutable@4.3.7:
-    resolution: {integrity: sha512-1hqclzwYwjRDFLjcFxOM5AYkkG0rpFPpr1RLPMEuGczoS7YA8gLhy8SWXYRAA/XwfEHpfo3cw5JGioS32fnMRw==}
+  immutable@4.3.8:
+    resolution: {integrity: sha512-d/Ld9aLbKpNwyl0KiM2CT1WYvkitQ1TSvmRtkcV8FKStiDoA7Slzgjmb/1G2yhKM1p0XeNOieaTbFZmU1d3Xuw==}
 
   is-binary-path@2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
@@ -155,7 +155,7 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  immutable@4.3.7: {}
+  immutable@4.3.8: {}
 
   is-binary-path@2.1.0:
     dependencies:
@@ -182,7 +182,7 @@ snapshots:
   sass@1.77.6:
     dependencies:
       chokidar: 3.6.0
-      immutable: 4.3.7
+      immutable: 4.3.8
       source-map-js: 1.2.1
 
   source-map-js@1.2.1: {}
