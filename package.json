@@ -15,7 +15,7 @@
 	},
 	"devDependencies": {
 		"bootstrap": "^5.3.3",
-		"chokidar": "^4.0.3",
+		"chokidar": "^5.0.0",
 		"sass": "1.77.6"
 	},
 	"packageManager": "pnpm@10.34.1+sha512.b58fbde6dca66a929538021581f648b4570b6ca19b18e7cbd7f2c07a7b24454155388dacdf08f2af3678e88a6d1fe04f9d609df24bf51735a060ea041b374ab7"
