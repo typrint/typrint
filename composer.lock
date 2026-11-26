@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "74e35852cd262854888310889f12ccc7",
+    "content-hash": "e394334f75638bb0c98b104a141646bd",
     "packages": [
         {
             "name": "composer/semver",
@@ -1459,20 +1459,20 @@
         },
         {
             "name": "symfony/process",
-            "version": "v7.4.24",
+            "version": "v8.1.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "e88ac51768062ad548bf2f900c52231e7e83e475"
+                "reference": "4969fe2cf92f0075b070ab2bc0faef2734114bae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/e88ac51768062ad548bf2f900c52231e7e83e475",
-                "reference": "e88ac51768062ad548bf2f900c52231e7e83e475",
+                "url": "https://api.github.com/repos/symfony/process/zipball/4969fe2cf92f0075b070ab2bc0faef2734114bae",
+                "reference": "4969fe2cf92f0075b070ab2bc0faef2734114bae",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2"
+                "php": ">=8.4.1"
             },
             "type": "library",
             "autoload": {
@@ -1500,7 +1500,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v7.4.24"
+                "source": "https://github.com/symfony/process/tree/v8.1.12"
             },
             "funding": [
                 {
@@ -1520,8 +1520,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-11-23T08:23:51+00:00",
-            "published-time": "2026-11-25T09:25:48+00:00"
+            "time": "2026-11-23T09:20:57+00:00",
+            "published-time": "2026-11-25T09:29:08+00:00"
         },
         {
             "name": "symfony/service-contracts",
