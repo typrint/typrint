@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "74e35852cd262854888310889f12ccc7",
+    "content-hash": "572d0d5ea71566d87f16124c75014e5d",
     "packages": [
         {
             "name": "composer/semver",
@@ -709,16 +709,16 @@
         },
         {
             "name": "swow/swow",
-            "version": "v1.6.2",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swow/swow.git",
-                "reference": "7aa2fa652baf621d21fd87cb74d8a6a7b5a70f9a"
+                "reference": "a40d23768ae91d0d549a4378c956eda45d97af6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swow/swow/zipball/7aa2fa652baf621d21fd87cb74d8a6a7b5a70f9a",
-                "reference": "7aa2fa652baf621d21fd87cb74d8a6a7b5a70f9a",
+                "url": "https://api.github.com/repos/swow/swow/zipball/a40d23768ae91d0d549a4378c956eda45d97af6b",
+                "reference": "a40d23768ae91d0d549a4378c956eda45d97af6b",
                 "shasum": ""
             },
             "require": {
@@ -729,14 +729,15 @@
                 "psr/http-message": "^1.1|^2.0"
             },
             "replace": {
-                "swow/php-stub-generator": "*",
-                "swow/psr7-plus": "*",
-                "swow/swow-library": "*",
-                "swow/swow-stub": "*",
-                "swow/swow-utils": "*"
+                "swow/php-stub-generator": "self.version",
+                "swow/psr7-plus": "^1.2",
+                "swow/swow-library": "self.version",
+                "swow/swow-stub": "self.version",
+                "swow/swow-utils": "self.version"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3",
+                "friendsofphp/php-cs-fixer": "3.95.27",
+                "nyholm/psr7": "^1.8",
                 "phan/phan": "^5.4",
                 "phpstan/phpstan": "^1.10",
                 "phpunit/phpunit": "^9|^10|^11",
@@ -790,10 +791,10 @@
             ],
             "support": {
                 "issues": "https://github.com/swow/swow",
-                "source": "https://github.com/swow/swow/tree/v1.6.2"
+                "source": "https://github.com/swow/swow/tree/v2.1.0"
             },
-            "time": "2025-11-03T12:41:01+00:00",
-            "published-time": "2025-11-03T15:06:49+00:00"
+            "time": "2026-11-27T17:44:43+00:00",
+            "published-time": "2026-11-27T18:08:59+00:00"
         },
         {
             "name": "symfony/config",
